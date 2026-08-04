@@ -1,0 +1,45 @@
+*{ 
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; 
+}
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+form{
+    background-color: #232323;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 5px;
+}
+
+form label{
+    display: block;
+    color: #fff;
+    margin-bottom: 5px;
+}
+
+form input{
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+}
+button{
+    padding: 10px 25px;
+    color: black;
+    background-color: white;
+    border: none;
+    border-radius: 5px;
+    transition: .3s ease;
+    cursor: pointer;
+}
+
+button:hover{
+    background-color: gray;
+
+}
