@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence                                  https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+  <!-- Define el nombre de la unidad de persistencia -->
+  <persistence-unit name="PersistenceUnit" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+    <class>org.example.logica.Alumno</class>
+    <class>org.example.logica.Carrera</class>
+    <class>org.example.logica.Materia</class>
+    <properties>
+      <!-- 1. Parámetros de conexión JDBC a MySQL -->
+      <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/pruebajpa?useSSL=false&amp;serverTimezone=UTC"/>
+      <property name="jakarta.persistence.jdbc.user" value="root"/>
+      <property name="jakarta.persistence.jdbc.password" value="1234"/>
+      <!-- 2. Configuración de Hibernate -->
+      <!-- auto: valida, update, create, create-drop -->
+      <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+      <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.format_sql" value="true"/>
+      <property name="hibernate.highlight_sql" value="true"/>
+    </properties>
+  </persistence-unit>
+</persistence>

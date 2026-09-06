@@ -1,0 +1,201 @@
+<!--
+    ============================================================================
+    login.html
+    ============================================================================
+    Vista de inicio de sesión. Está basada en el diseño visual de
+    "page-login.html" de la plantilla Spark Admin, adaptada para funcionar
+    como plantilla Thymeleaf dentro de Spring Boot.
+
+    xmlns:th="http://www.thymeleaf.org":
+        Declara el espacio de nombres XML de Thymeleaf. Es lo que permite
+        usar atributos como th:href, th:action, etc. Es solo una
+        declaración XML: no afecta en nada al HTML final que recibe el
+        navegador (Thymeleaf los procesa y los elimina/reemplaza en el
+        servidor antes de enviar la respuesta).
+    ============================================================================
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Spark Admin</title>
+
+    <!--
+        th:href="@{...}":
+        La expresión @{...} es la "expresión de URL" de Thymeleaf. Genera
+        automáticamente URLs correctas relativas al contexto de la
+        aplicación (útil si la app se despliega bajo un subpath). Aquí se
+        usa para referenciar los recursos estáticos copiados desde Spark
+        Admin, ahora ubicados en src/main/resources/static/.
+    -->
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.ico}">
+
+    <link rel="stylesheet" th:href="@{/libs/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/libs/bootstrap-icons/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+
+<div class="login-wrapper">
+    <div class="login-bg-shape login-bg-shape-1"></div>
+    <div class="login-bg-shape login-bg-shape-2"></div>
+
+    <div class="login-card">
+
+        <a th:href="@{/login}" class="login-brand text-decoration-none">
+            <i class="bi bi-asterisk"></i>
+            <span>Spark Admin</span>
+        </a>
+
+        <p class="login-subtitle">Ingrese sus credenciales para acceder al panel</p>
+
+        <!-- ==========================================================
+             BLOQUE DE MENSAJES DE ESTADO / ERROR
+             ==========================================================
+             Cada bloque se muestra u oculta según los parámetros de la
+             query string presentes en la URL, leídos con
+             ${param.NOMBRE_DEL_PARAMETRO}. Estos parámetros son agregados
+             por CustomAuthenticationFailureHandler (en caso de error),
+             por CustomAuthenticationSuccessHandler/SecurityConfig (logout)
+             o por RegistroController (registro exitoso).
+             th:if evalúa la expresión; si es verdadera, el elemento se
+             renderiza, si es falsa, se omite por completo del HTML final.
+        =========================================================== -->
+
+        <!-- Caso: el correo ingresado no existe -> invitar a registrarse -->
+        <div class="alert-custom alert-custom-warning" th:if="${param.errorNoRegistrado}">
+            <i class="bi bi-person-exclamation alert-custom-icon"></i>
+            <div class="alert-custom-content">
+                No existe ninguna cuenta registrada con ese correo electrónico.
+                <a th:href="@{/registro}"><strong>Regístrate aquí</strong></a> para crear una cuenta nueva.
+            </div>
+        </div>
+
+        <!-- Caso: cuenta bloqueada por superar el límite de intentos -->
+        <div class="alert-custom alert-custom-danger" th:if="${param.errorBloqueado}">
+            <i class="bi bi-shield-lock-fill alert-custom-icon"></i>
+            <div class="alert-custom-content">
+                Cuenta bloqueada por superar el límite de 3 intentos fallidos.
+            </div>
+        </div>
+
+        <!-- Caso: contraseña incorrecta, todavía quedan intentos disponibles -->
+        <div class="alert-custom alert-custom-danger" th:if="${param.errorCredenciales}">
+            <i class="bi bi-exclamation-triangle-fill alert-custom-icon"></i>
+            <div class="alert-custom-content">
+                Contraseña incorrecta.
+                <span th:if="${param.intentos}">
+                    Intento <span th:text="${param.intentos[0]}">1</span> de 3.
+                    <span th:if="${param.intentos[0] == '2'}">Un intento fallido más bloqueará su cuenta.</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Caso genérico de error no contemplado explícitamente -->
+        <div class="alert-custom alert-custom-danger" th:if="${param.error}">
+            <i class="bi bi-exclamation-triangle-fill alert-custom-icon"></i>
+            <div class="alert-custom-content">
+                Ocurrió un error al iniciar sesión. Intente nuevamente.
+            </div>
+        </div>
+
+        <!-- Caso: sesión cerrada correctamente -->
+        <div class="alert-custom alert-custom-info" th:if="${param.logout}">
+            <i class="bi bi-info-circle-fill alert-custom-icon"></i>
+            <div class="alert-custom-content">
+                Sesión cerrada correctamente.
+            </div>
+        </div>
+
+        <!-- Caso: registro exitoso, ahora puede iniciar sesión -->
+        <div class="alert-custom alert-custom-success" th:if="${param.registroExitoso}">
+            <i class="bi bi-check-circle-fill alert-custom-icon"></i>
+            <div class="alert-custom-content">
+                ¡Registro exitoso! Ya puede iniciar sesión con su correo y contraseña.
+            </div>
+        </div>
+
+        <!-- ==========================================================
+             FORMULARIO DE LOGIN
+             ==========================================================
+             th:action="@{/login}":
+                 Apunta exactamente a la misma URL configurada en
+                 SecurityConfig como loginProcessingUrl("/login"). Spring
+                 Security intercepta este POST directamente en su cadena
+                 de filtros; ningún @Controller nuestro procesa este envío.
+
+             method="post":
+                 Obligatorio: Spring Security, por seguridad, solo procesa
+                 el login mediante POST (evita, por ejemplo, que las
+                 credenciales queden expuestas en el historial del
+                 navegador o en logs de servidores, como ocurriría con GET).
+
+             Campo CSRF oculto:
+                 Al usar th:action, Thymeleaf (integrado con Spring
+                 Security mediante la dependencia
+                 thymeleaf-extras-springsecurity6) inserta AUTOMÁTICAMENTE
+                 un campo oculto <input type="hidden" name="_csrf" .../>
+                 con el token CSRF vigente de la sesión. Sin este token,
+                 Spring Security rechazaría el POST por razones de
+                 seguridad (protección contra ataques de falsificación de
+                 peticiones entre sitios).
+        =========================================================== -->
+        <form th:action="@{/login}" method="post" id="loginForm" class="needs-validation" novalidate>
+
+            <div class="login-form-group">
+                <label for="username" class="login-form-label">Correo Personal</label>
+                <div class="login-input-group">
+                    <i class="bi bi-envelope input-icon"></i>
+                    <!--
+                        name="username":
+                        Debe coincidir EXACTAMENTE con
+                        .usernameParameter("username") configurado en
+                        SecurityConfig, ya que es el nombre de campo que
+                        Spring Security busca dentro de la petición POST
+                        para saber con qué correo intentar autenticar.
+
+                        th:value="${param.email}":
+                        Si el intento anterior falló, se vuelve a
+                        precargar el correo ingresado (enviado como
+                        parámetro "email" por
+                        CustomAuthenticationFailureHandler), evitando que
+                        el usuario tenga que volver a escribirlo.
+                    -->
+                    <input type="email" id="username" name="username" class="login-input"
+                           placeholder="nombre@correo.com" th:value="${param.email}" required autofocus>
+                </div>
+            </div>
+
+            <div class="login-form-group">
+                <label for="password" class="login-form-label">Contraseña</label>
+                <div class="login-input-group">
+                    <i class="bi bi-shield-lock input-icon"></i>
+                    <!-- name="password": debe coincidir con .passwordParameter("password") de SecurityConfig -->
+                    <input type="password" id="password" name="password"
+                           class="login-input login-input-password" placeholder="••••••••" required>
+                    <button type="button" class="password-toggle-btn" id="toggle-password"
+                            aria-label="Mostrar contraseña">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login" id="btn-submit">
+                <span>Ingresar al Sistema</span>
+                <i class="bi bi-arrow-right"></i>
+            </button>
+
+        </form>
+
+        <p class="login-footer-text">
+            ¿No tiene una cuenta? <a th:href="@{/registro}" id="link-register">Regístrese aquí</a>
+        </p>
+
+    </div>
+</div>
+
+<script th:src="@{/libs/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/auth.js}"></script>
+</body>
+</html>

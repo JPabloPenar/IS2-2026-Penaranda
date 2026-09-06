@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    ==========================================================================
+     pom.xml - Project Object Model (Maven)
+    ==========================================================================
+    Este archivo es el descriptor central de un proyecto Maven. Le indica a
+    Maven:
+      1) Quién es el proyecto (groupId/artifactId/version).
+      2) De qué "padre" (parent) hereda configuración por defecto
+         (en este caso, Spring Boot se encarga de fijar versiones
+         compatibles entre sí de todas las librerías -> "dependency
+         management").
+      3) Qué dependencias (librerías) necesita el proyecto para compilar
+         y ejecutarse.
+      4) Qué plugins se usan para construir el artefacto final (el .jar
+         ejecutable).
+    ==========================================================================
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+        spring-boot-starter-parent:
+        Es un "super POM" mantenido por el equipo de Spring Boot. Al heredar
+        de él obtenemos:
+          - Gestión centralizada de versiones (BOM) para todas las
+            dependencias "spring-boot-starter-*" y librerías asociadas
+            (Hibernate, Jackson, Tomcat embebido, etc.), de forma que no
+            tengamos que declarar manualmente cada versión y así evitar
+            incompatibilidades.
+          - Configuración por defecto de plugins de compilación (por
+            ejemplo, la versión de Java a usar, el plugin de empaquetado).
+          - El plugin "spring-boot-maven-plugin" listo para generar un JAR
+            ejecutable ("fat jar") con un servidor Tomcat embebido incluido.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <!-- Versión estable de Spring Boot 3.x, compatible con Java 17+ -->
+        <version>3.3.4</version>
+        <relativePath/> <!-- le indica a Maven que busque el parent en el repositorio remoto, no en el disco local -->
+    </parent>
+
+    <!-- Identificación única del proyecto dentro del "universo" Maven -->
+    <groupId>com.sparkadmin</groupId>
+    <artifactId>spark-admin-app</artifactId>
+    <version>1.0.0</version>
+    <!-- packaging=jar -> el resultado final será un .jar ejecutable (no un .war) -->
+    <packaging>jar</packaging>
+
+    <name>spark-admin-app</name>
+    <description>
+        Aplicación web Spring Boot que integra la plantilla visual "Spark Admin"
+        con un módulo de autenticación (login/registro) basado en Spring Security,
+        incluyendo bloqueo de cuenta tras 3 intentos fallidos.
+    </description>
+
+    <!-- ====================== PROPIEDADES GLOBALES ====================== -->
+    <properties>
+        <!-- Versión de Java del proyecto (código fuente y bytecode objetivo) -->
+        <java.version>17</java.version>
+        <!-- Forzamos UTF-8 en todo el ciclo de build para evitar problemas con tildes/ñ -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <!-- ============================ DEPENDENCIAS ========================= -->
+    <dependencies>
+
+        <!--
+            spring-boot-starter-web:
+            Incluye Spring MVC (controladores @Controller, @RestController,
+            manejo de peticiones HTTP) y un servidor Tomcat embebido para
+            poder ejecutar la aplicación como un simple .jar sin necesidad
+            de instalar un servidor de aplicaciones externo.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!--
+            spring-boot-starter-thymeleaf:
+            Motor de plantillas del lado del servidor. Permite escribir
+            archivos .html "normales" que Thymeleaf procesa en el servidor
+            para inyectar datos dinámicos (th:text, th:each, th:if, th:href,
+            th:field, etc.) antes de enviar el HTML final al navegador.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+        <!--
+            spring-boot-starter-data-jpa:
+            Provee Spring Data JPA + Hibernate como implementación de JPA
+            (Java Persistence API). Permite mapear clases Java a tablas de
+            base de datos (@Entity) y crear repositorios (interfaces que
+            extienden JpaRepository) sin escribir SQL manualmente para las
+            operaciones CRUD básicas.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!--
+            spring-boot-starter-security:
+            Núcleo de Spring Security. Aporta el filtro de autenticación,
+            el contexto de seguridad (SecurityContext), soporte para
+            formLogin, gestión de sesiones, encriptación de contraseñas
+            (PasswordEncoder), protección CSRF, etc.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!--
+            spring-boot-starter-validation:
+            Habilita Bean Validation (Jakarta Validation / Hibernate
+            Validator) para poder anotar los DTOs con @NotBlank, @Email,
+            @Size, @Past, etc. y usar @Valid en los controladores.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!--
+            thymeleaf-extras-springsecurity6:
+            Puente entre Thymeleaf y Spring Security. Permite usar en las
+            plantillas HTML atributos como sec:authorize="isAuthenticated()"
+            o acceder al usuario autenticado directamente desde la vista.
+        -->
+        <dependency>
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-springsecurity6</artifactId>
+        </dependency>
+
+        <!--
+            com.h2database:h2:
+            Base de datos relacional 100% en Java, embebida en memoria.
+            Ideal para desarrollo y pruebas locales porque no requiere
+            instalar ni configurar un servidor de base de datos externo:
+            los datos existen mientras la aplicación está corriendo (o
+            pueden persistirse en un archivo local, según configuración).
+            Alcance "runtime": solo se necesita en tiempo de ejecución,
+            no para compilar el código.
+        -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!--
+            (Alternativa para producción / MySQL real - queda comentada)
+            Si se desea usar MySQL en lugar de H2, descomentar esta
+            dependencia y ajustar application.properties con la URL,
+            usuario y contraseña de la base de datos MySQL.
+
+            <dependency>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
+                <scope>runtime</scope>
+            </dependency>
+        -->
+
+        <!--
+            spring-boot-starter-test:
+            Conjunto de librerías para pruebas (JUnit 5, Mockito,
+            AssertJ, Spring Test). Alcance "test": solo disponible durante
+            la ejecución de pruebas, no se empaqueta en el jar final.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--
+            spring-security-test:
+            Utilidades específicas para probar configuraciones de Spring
+            Security (por ejemplo, simular usuarios autenticados en tests
+            de controladores con @WithMockUser).
+        -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <!-- ============================== BUILD ============================= -->
+    <build>
+        <!-- El nombre final del artefacto generado será spark-admin-app.jar -->
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <!--
+                spring-boot-maven-plugin:
+                Se encarga de empaquetar la aplicación como un JAR ejecutable
+                ("fat jar") que incluye todas las dependencias y un servidor
+                Tomcat embebido, de forma que se pueda ejecutar simplemente
+                con: java -jar spark-admin-app.jar
+            -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

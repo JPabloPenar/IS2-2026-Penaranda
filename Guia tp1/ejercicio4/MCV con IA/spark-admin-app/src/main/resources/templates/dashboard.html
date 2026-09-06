@@ -1,0 +1,227 @@
+<!--
+    ============================================================================
+    dashboard.html
+    ============================================================================
+    Vista protegida principal de la aplicación (accesible solo tras iniciar
+    sesión). Reutiliza la estructura general de layout de "index.html" de
+    Spark Admin (sidebar + navbar superior + área de contenido + footer),
+    simplificando el contenido central: en lugar de los widgets de ventas de
+    ejemplo de la plantilla original, se muestra una tarjeta de bienvenida
+    con los datos reales de la Persona autenticada.
+
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security6":
+        Espacio de nombres adicional que habilita los atributos "sec:*"
+        provistos por la dependencia thymeleaf-extras-springsecurity6,
+        usados aquí para mostrar el nombre de usuario autenticado y para
+        generar el formulario de logout de forma segura (con su token CSRF).
+    ============================================================================
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Principal - Spark Admin</title>
+
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/libs/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/libs/bootstrap-icons/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/libs/flatpickr/flatpickr.min.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body>
+
+<!-- ==========================================================
+     SIDEBAR
+     ========================================================== -->
+<div class="sidebar-wrapper" id="sidebar">
+    <a th:href="@{/dashboard}" class="sidebar-brand">
+        <i class="bi bi-asterisk"></i>
+        <span>Spark Admin</span>
+    </a>
+
+    <div class="flex-grow-1 overflow-y-auto">
+        <div class="sidebar-menu-section">
+            <div class="sidebar-menu-title">Menú</div>
+            <ul class="sidebar-menu-list">
+                <li class="sidebar-menu-item">
+                    <a th:href="@{/dashboard}" class="sidebar-menu-link active" title="Panel Principal">
+                        <i class="bi bi-grid-fill"></i>
+                        <span>Panel Principal</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Tarjeta de perfil del sidebar: muestra el nombre real del usuario autenticado -->
+    <div class="sidebar-profile">
+        <img th:src="@{/images/avatar.png}" alt="Avatar" class="sidebar-profile-img">
+        <div class="sidebar-profile-info">
+            <!-- ${persona.nombre} + ' ' + ${persona.apellido}: concatenación de expresiones Thymeleaf -->
+            <div class="sidebar-profile-name" th:text="${persona.nombre} + ' ' + ${persona.apellido}">
+                Nombre Apellido
+            </div>
+            <div class="sidebar-profile-email" th:text="${persona.correoPersonal}">correo@ejemplo.com</div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================
+     CONTENIDO PRINCIPAL
+     ========================================================== -->
+<div class="main-wrapper">
+
+    <header class="navbar-custom">
+        <div class="navbar-left">
+            <button class="sidebar-toggle-btn me-2" id="sidebar-toggle" aria-label="Alternar Navegación">
+                <i class="bi bi-list"></i>
+            </button>
+        </div>
+
+        <div class="navbar-actions">
+            <!-- Dropdown de perfil con opción de cerrar sesión -->
+            <div class="dropdown ms-2">
+                <button class="navbar-profile-btn dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    <img th:src="@{/images/avatar.png}" alt="Perfil" class="navbar-profile-img">
+                    <!--
+                        sec:authentication="name":
+                        Atributo de la integración Thymeleaf + Spring
+                        Security que imprime directamente el "nombre" (en
+                        este caso, el correoPersonal) del usuario
+                        actualmente autenticado, sin necesidad de que el
+                        controlador lo agregue manualmente al modelo.
+                    -->
+                    <span class="navbar-profile-name d-none d-md-inline" sec:authentication="name">usuario</span>
+                    <i class="bi bi-chevron-down navbar-profile-caret"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-profile">
+                    <li class="dropdown-header">¡Bienvenido!</li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <!--
+                            Formulario de LOGOUT:
+                            Por seguridad, Spring Security exige que el
+                            cierre de sesión se realice mediante POST (no
+                            un simple <a href="/logout">), para evitar que
+                            un enlace malicioso en un sitio de terceros
+                            pueda cerrar la sesión de un usuario sin su
+                            consentimiento (o peor, ser usado para
+                            ataques CSRF si fuera GET). th:action agrega
+                            automáticamente el token CSRF requerido.
+                        -->
+                        <form th:action="@{/logout}" method="post">
+                            <button type="submit" class="dropdown-item text-danger border-0 bg-transparent w-100 text-start">
+                                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==========================================================
+         BANNER DE BIENVENIDA
+         ========================================================== -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">
+                <!-- Concatenación de texto literal + expresión Thymeleaf -->
+                Bienvenido/a, <span th:text="${persona.nombre}">Nombre</span>
+            </h1>
+            <p class="page-subtitle">Este es su panel principal dentro del sistema.</p>
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         TARJETA CON LOS DATOS DE LA PERSONA AUTENTICADA
+         ========================================================== -->
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <div class="card border-light shadow-sm p-4">
+                <h5 class="card-title mb-4">
+                    <i class="bi bi-person-badge"></i> Mis Datos Personales
+                </h5>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-label-custom">Nombre completo</div>
+                        <!--
+                            th:text="${persona.nombre} + ' ' + ${persona.apellido}":
+                            ${persona} es el atributo agregado al modelo
+                            por DashboardController.mostrarDashboard(...);
+                            Thymeleaf accede a sus propiedades usando la
+                            convención de getters de JavaBean
+                            (persona.nombre -> persona.getNombre()).
+                        -->
+                        <p class="mb-0" th:text="${persona.nombre} + ' ' + ${persona.apellido}">
+                            Nombre Apellido
+                        </p>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <div class="form-label-custom">Documento</div>
+                        <p class="mb-0" th:text="${persona.documento}">00000000</p>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <div class="form-label-custom">Fecha de Nacimiento</div>
+                        <!--
+                            #temporals.format(...):
+                            Utilidad de Thymeleaf para dar formato a
+                            objetos de fecha/hora (LocalDate, LocalDateTime,
+                            etc.) sin necesidad de convertirlos
+                            manualmente en el controlador.
+                        -->
+                        <p class="mb-0" th:text="${#temporals.format(persona.fechaNacimiento, 'dd/MM/yyyy')}">
+                            01/01/2000
+                        </p>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <div class="form-label-custom">Correo Personal (usuario)</div>
+                        <p class="mb-0" th:text="${persona.correoPersonal}">correo@ejemplo.com</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="card border-light shadow-sm p-4 h-100">
+                <h5 class="card-title mb-3">
+                    <i class="bi bi-shield-check"></i> Estado de la Cuenta
+                </h5>
+                <div class="alert-custom alert-custom-success mb-0">
+                    <i class="bi bi-check-circle-fill alert-custom-icon"></i>
+                    <div class="alert-custom-content">
+                        Sesión iniciada correctamente. Su cuenta se encuentra activa y sin bloqueos.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-custom">
+        <div class="footer-left">
+            <span class="footer-logo">
+                <i class="bi bi-asterisk"></i> Spark Admin
+            </span>
+            <span class="footer-separator">|</span>
+            <span class="footer-copy">Adaptación con Spring Boot, Spring Security y Thymeleaf</span>
+        </div>
+    </footer>
+
+</div>
+
+<script th:src="@{/libs/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/libs/flatpickr/flatpickr.min.js}"></script>
+<script th:src="@{/js/dashboard.js}"></script>
+</body>
+</html>

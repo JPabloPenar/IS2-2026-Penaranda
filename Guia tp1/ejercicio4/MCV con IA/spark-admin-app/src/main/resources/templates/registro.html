@@ -1,0 +1,184 @@
+<!--
+    ============================================================================
+    registro.html
+    ============================================================================
+    Formulario de alta de nuevos usuarios, construido con los componentes de
+    formulario "form-control-custom" / "form-label-custom" /
+    "form-feedback-custom" tomados de ui-forms.html de Spark Admin,
+    dentro de una tarjeta ("card") centrada similar visualmente a la
+    pantalla de login.
+    ============================================================================
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Usuario - Spark Admin</title>
+
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/libs/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/libs/bootstrap-icons/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<!--
+    Se reutiliza la clase "login-wrapper" (fondo con formas decorativas)
+    para mantener la misma identidad visual que la pantalla de login,
+    pero con una tarjeta más ancha ("login-card" + estilo inline de ancho
+    máximo) para acomodar todos los campos del registro.
+-->
+<body>
+
+<div class="login-wrapper" style="align-items: flex-start; padding: 3rem 1rem;">
+    <div class="login-bg-shape login-bg-shape-1"></div>
+    <div class="login-bg-shape login-bg-shape-2"></div>
+
+    <div class="login-card" style="max-width: 640px;">
+
+        <a th:href="@{/login}" class="login-brand text-decoration-none">
+            <i class="bi bi-asterisk"></i>
+            <span>Spark Admin</span>
+        </a>
+
+        <p class="login-subtitle">Complete el formulario para crear su cuenta</p>
+
+        <!-- ==========================================================
+             FORMULARIO DE REGISTRO
+             ==========================================================
+             th:object="${registroDTO}":
+                 Declara CUÁL es el objeto del "modelo" que este formulario
+                 va a editar. A partir de aquí, todos los campos usan la
+                 sintaxis abreviada "*{propiedad}" (en lugar de
+                 "${registroDTO.propiedad}") para referirse a las
+                 propiedades de ESE objeto.
+
+             th:action="@{/registro}" method="post":
+                 Envía los datos mediante POST a RegistroController,
+                 método procesarRegistro(...).
+        =========================================================== -->
+        <form th:action="@{/registro}" th:object="${registroDTO}" method="post" novalidate>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="nombre" class="form-label-custom">Nombre</label>
+                    <!--
+                        th:field="*{nombre}":
+                        Es el atributo Thymeleaf MÁS importante para
+                        formularios. En una sola instrucción hace tres
+                        cosas:
+                          1) Genera el atributo id="nombre".
+                          2) Genera el atributo name="nombre".
+                          3) Genera el atributo value="..." con el valor
+                             ACTUAL de registroDTO.getNombre() (útil para
+                             que, si el formulario se vuelve a mostrar por
+                             un error de validación, los datos ya
+                             ingresados por el usuario no se pierdan).
+
+                        th:classappend:
+                        Agrega dinámicamente una clase CSS adicional
+                        (is-invalid-custom) SOLO si el campo tiene errores
+                        de validación, para resaltarlo visualmente en rojo
+                        según el diseño de Spark Admin.
+                    -->
+                    <input type="text" class="form-control-custom" id="nombre" th:field="*{nombre}"
+                           th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid-custom'"
+                           placeholder="Ingrese su nombre">
+                    <!--
+                        th:if="${#fields.hasErrors('nombre')}":
+                        #fields es un objeto de utilidad que provee
+                        Thymeleaf específicamente para trabajar con
+                        formularios y BindingResult. hasErrors('campo')
+                        devuelve true si ese campo específico tiene al
+                        menos un error de validación asociado.
+
+                        th:errors="*{nombre}":
+                        Renderiza el/los mensaje(s) de error de validación
+                        asociados a ese campo (los mismos "message = ..."
+                        definidos en las anotaciones de RegistroDTO, o los
+                        agregados manualmente con bindingResult.rejectValue
+                        en el controlador).
+                    -->
+                    <div class="form-feedback-custom invalid-custom" th:if="${#fields.hasErrors('nombre')}"
+                         th:errors="*{nombre}">
+                        Error de ejemplo
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="apellido" class="form-label-custom">Apellido</label>
+                    <input type="text" class="form-control-custom" id="apellido" th:field="*{apellido}"
+                           th:classappend="${#fields.hasErrors('apellido')} ? 'is-invalid-custom'"
+                           placeholder="Ingrese su apellido">
+                    <div class="form-feedback-custom invalid-custom" th:if="${#fields.hasErrors('apellido')}"
+                         th:errors="*{apellido}">Error de ejemplo</div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="documento" class="form-label-custom">Documento</label>
+                    <input type="text" class="form-control-custom" id="documento" th:field="*{documento}"
+                           th:classappend="${#fields.hasErrors('documento')} ? 'is-invalid-custom'"
+                           placeholder="Número de documento">
+                    <div class="form-feedback-custom invalid-custom" th:if="${#fields.hasErrors('documento')}"
+                         th:errors="*{documento}">Error de ejemplo</div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="fechaNacimiento" class="form-label-custom">Fecha de Nacimiento</label>
+                    <input type="date" class="form-control-custom" id="fechaNacimiento"
+                           th:field="*{fechaNacimiento}"
+                           th:classappend="${#fields.hasErrors('fechaNacimiento')} ? 'is-invalid-custom'">
+                    <div class="form-feedback-custom invalid-custom" th:if="${#fields.hasErrors('fechaNacimiento')}"
+                         th:errors="*{fechaNacimiento}">Error de ejemplo</div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="correoPersonal" class="form-label-custom">Correo Personal</label>
+                <input type="email" class="form-control-custom" id="correoPersonal" th:field="*{correoPersonal}"
+                       th:classappend="${#fields.hasErrors('correoPersonal')} ? 'is-invalid-custom'"
+                       placeholder="nombre@correo.com">
+                <!-- Este mismo correo será el "usuario" con el que iniciará sesión -->
+                <div class="form-feedback-custom invalid-custom" th:if="${#fields.hasErrors('correoPersonal')}"
+                     th:errors="*{correoPersonal}">Error de ejemplo</div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="password" class="form-label-custom">Contraseña</label>
+                    <input type="password" class="form-control-custom" id="password" th:field="*{password}"
+                           th:classappend="${#fields.hasErrors('password')} ? 'is-invalid-custom'"
+                           placeholder="Mínimo 6 caracteres">
+                    <div class="form-feedback-custom invalid-custom" th:if="${#fields.hasErrors('password')}"
+                         th:errors="*{password}">Error de ejemplo</div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="confirmarPassword" class="form-label-custom">Confirmar Contraseña</label>
+                    <input type="password" class="form-control-custom" id="confirmarPassword"
+                           th:field="*{confirmarPassword}"
+                           th:classappend="${#fields.hasErrors('confirmarPassword')} ? 'is-invalid-custom'"
+                           placeholder="Repita la contraseña">
+                    <div class="form-feedback-custom invalid-custom" th:if="${#fields.hasErrors('confirmarPassword')}"
+                         th:errors="*{confirmarPassword}">Error de ejemplo</div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login mt-2">
+                <span>Crear Cuenta</span>
+                <i class="bi bi-person-check ms-1"></i>
+            </button>
+
+        </form>
+
+        <p class="login-footer-text">
+            ¿Ya tiene una cuenta? <a th:href="@{/login}">Inicie sesión aquí</a>
+        </p>
+
+    </div>
+</div>
+
+<script th:src="@{/libs/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>
