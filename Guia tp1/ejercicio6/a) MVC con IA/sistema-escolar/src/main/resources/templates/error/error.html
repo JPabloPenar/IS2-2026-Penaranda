@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Error')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('')}"></aside>
+    <div class="main-content">
+        <main class="contenido">
+            <section class="hoja vacio">
+                <i class="bi bi-journal-x" aria-hidden="true"></i>
+                <h1 class="h3" th:text="${titulo} ?: 'Ocurrió un problema'">Ocurrió un problema</h1>
+                <p th:text="${mensaje} ?: 'No pudimos completar la acción. Vuelve al panel e inténtalo de nuevo.'">Detalle del error.</p>
+                <a th:href="@{/dashboard}" class="btn btn-tinta">Volver al panel</a>
+            </section>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

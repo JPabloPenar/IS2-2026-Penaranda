@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Crear cuenta')}"></head>
+<body>
+<main class="acceso">
+
+    <section class="acceso-cuaderno">
+        <p class="mb-3"><i class="bi bi-journal-bookmark-fill fs-2 text-warning" aria-hidden="true"></i></p>
+        <h1>Crea tu cuenta de docente.</h1>
+        <p class="mt-3">Al terminar te enviaremos un correo de bienvenida con el enlace para ingresar.</p>
+    </section>
+
+    <section class="acceso-form ancho">
+        <div class="caja">
+            <h2 class="mb-4">Datos del docente</h2>
+
+            <!--
+              th:object enlaza el formulario con el DTO "docente" del modelo.
+              *{campo} se resuelve contra ese objeto. th:field genera id, name y value,
+              y conserva lo escrito si hay errores.
+              La contraseña NO se vuelve a mostrar: password nunca se repone en el input.
+            -->
+            <form th:action="@{/registro}" th:object="${docente}" method="post" novalidate>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" th:field="*{nombre}" th:errorclass="is-invalid" autocomplete="given-name">
+                        <div class="error-campo" th:errors="*{nombre}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="apellido" class="form-label">Apellido</label>
+                        <input type="text" class="form-control" th:field="*{apellido}" th:errorclass="is-invalid" autocomplete="family-name">
+                        <div class="error-campo" th:errors="*{apellido}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="sexo" class="form-label">Sexo</label>
+                        <select class="form-select" th:field="*{sexo}" th:errorclass="is-invalid">
+                            <option value="">Selecciona una opción</option>
+                            <option th:each="g : ${generos}" th:value="${g}" th:text="${g.etiqueta}">Masculino</option>
+                        </select>
+                        <div class="error-campo" th:errors="*{sexo}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="fechaNacimiento" class="form-label">Fecha de nacimiento</label>
+                        <input type="date" class="form-control" th:field="*{fechaNacimiento}" th:errorclass="is-invalid">
+                        <div class="error-campo" th:errors="*{fechaNacimiento}"></div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" th:field="*{email}" th:errorclass="is-invalid" autocomplete="username">
+                        <div class="form-text">Será tu usuario para ingresar.</div>
+                        <div class="error-campo" th:errors="*{email}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" th:field="*{password}" th:errorclass="is-invalid" autocomplete="new-password">
+                        <div class="form-text">Mínimo 8 caracteres, con letras y números.</div>
+                        <div class="error-campo" th:errors="*{password}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="confirmarPassword" class="form-label">Repite la contraseña</label>
+                        <input type="password" class="form-control" th:field="*{confirmarPassword}" th:errorclass="is-invalid" autocomplete="new-password">
+                        <div class="error-campo" th:errors="*{confirmarPassword}"></div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-tinta w-100 mt-4">Crear cuenta</button>
+            </form>
+
+            <p class="mt-4 mb-0 text-center">¿Ya tienes cuenta? <a th:href="@{/login}">Ingresar</a></p>
+        </div>
+    </section>
+</main>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

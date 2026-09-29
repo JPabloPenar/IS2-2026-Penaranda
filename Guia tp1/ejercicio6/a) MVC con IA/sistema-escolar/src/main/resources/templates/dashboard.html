@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Panel')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('dashboard')}"></aside>
+
+    <div class="main-content">
+        <main class="contenido">
+            <div th:replace="~{fragments/layout :: mensajes}"></div>
+
+            <div class="page-head">
+                <div>
+                    <h1>Hola, <span th:text="${docente.nombre}">Docente</span></h1>
+                    <p>Este es el estado actual del colegio.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a th:href="@{/notas/nueva}" class="btn btn-marcador"><i class="bi bi-plus-lg" aria-hidden="true"></i> Registrar nota</a>
+                    <a th:href="@{/alumnos/nuevo}" class="btn btn-tinta">Agregar alumno</a>
+                </div>
+            </div>
+
+            <!-- Franja de resumen: una sola hoja dividida en cuatro datos -->
+            <section class="hoja resumen" aria-label="Resumen">
+                <div><div class="cifra" th:text="${totalAlumnos}">0</div><div class="rotulo">Alumnos</div></div>
+                <div><div class="cifra" th:text="${totalMaterias}">0</div><div class="rotulo">Materias</div></div>
+                <div><div class="cifra" th:text="${totalNotas}">0</div><div class="rotulo">Notas registradas</div></div>
+                <div><div class="cifra" th:text="${#numbers.formatDecimal(promedio, 1, 2)}">0,00</div><div class="rotulo">Promedio general</div></div>
+            </section>
+
+            <section class="hoja">
+                <div class="hoja-titulo">
+                    <h2 class="mb-0">Últimas notas cargadas</h2>
+                    <a th:href="@{/notas}">Ver todas</a>
+                </div>
+
+                <div class="table-responsive" th:if="${!ultimasNotas.isEmpty()}">
+                    <table class="tabla">
+                        <thead>
+                        <tr><th>Alumno</th><th>Materia</th><th>Período</th><th>Nota</th><th>Registrada por</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="n : ${ultimasNotas}">
+                            <td th:text="${n.alumnoNombre}">Pérez, Ana</td>
+                            <td th:text="${n.materiaNombre}">Matemática</td>
+                            <td th:text="${n.periodo.etiqueta}">1.er trimestre</td>
+                            <td><span class="nota-marca" th:classappend="${n.aprobado} ? 'nota-ok' : 'nota-bajo'"
+                                      th:text="${#numbers.formatDecimal(n.valorNumerico, 1, 2)}">8,00</span></td>
+                            <td th:text="${n.docenteNombre}">Docente</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="vacio" th:if="${ultimasNotas.isEmpty()}">
+                    <i class="bi bi-journal-plus" aria-hidden="true"></i>
+                    Todavía no hay notas. Agrega un alumno y registra la primera calificación.
+                </div>
+            </section>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

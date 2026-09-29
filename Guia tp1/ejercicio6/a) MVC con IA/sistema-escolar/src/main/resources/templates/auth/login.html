@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Ingresar')}"></head>
+<body>
+<main class="acceso">
+
+    <!-- Panel izquierdo con motivo de cuaderno rayado -->
+    <section class="acceso-cuaderno">
+        <p class="mb-3"><i class="bi bi-journal-bookmark-fill fs-2 text-warning" aria-hidden="true"></i></p>
+        <h1>Alumnos, materias y notas en un solo cuaderno.</h1>
+        <p class="mt-3">Ingresa con tu email de docente para cargar calificaciones y consultar tus cursos.</p>
+    </section>
+
+    <!-- Formulario de ingreso -->
+    <section class="acceso-form">
+        <div class="caja">
+            <h2 class="mb-1">Ingresar</h2>
+            <p class="text-secondary mb-4">Usa el email con el que te registraste.</p>
+
+            <!-- Aviso al registrarse (flash) -->
+            <div class="alert alert-success toast-msg" role="status" th:if="${mensajeExito}" th:text="${mensajeExito}"></div>
+            <!-- ?error=true lo agrega Spring Security cuando falla la autenticación -->
+            <div class="alert alert-danger" role="alert" th:if="${param.error}">
+                El email o la contraseña no coinciden. Revisa los datos e intenta de nuevo.
+            </div>
+            <!-- ?logout=true lo agrega Spring Security tras cerrar sesión -->
+            <div class="alert alert-info" role="status" th:if="${param.logout}">
+                Cerraste sesión correctamente.
+            </div>
+
+            <!-- th:action agrega el token CSRF oculto. Los name (email, password) deben coincidir con SecurityConfig -->
+            <form th:action="@{/login}" method="post" novalidate>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" autocomplete="username" required autofocus>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" required>
+                        <button type="button" class="btn btn-outline-secondary" data-ver-password="password" aria-label="Mostrar contraseña">
+                            <i class="bi bi-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-tinta w-100">Ingresar</button>
+            </form>
+
+            <p class="mt-4 mb-0 text-center">¿Aún no tienes cuenta? <a th:href="@{/registro}">Registrarme como docente</a></p>
+        </div>
+    </section>
+</main>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

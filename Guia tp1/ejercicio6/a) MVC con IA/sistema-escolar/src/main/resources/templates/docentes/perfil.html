@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Mi perfil')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('perfil')}"></aside>
+
+    <div class="main-content">
+        <main class="contenido">
+            <div class="page-head">
+                <div>
+                    <h1>Mi perfil</h1>
+                    <p>Estos son los datos con los que te registraste.</p>
+                </div>
+                <a th:href="@{/cambiar-password}" class="btn btn-tinta">Cambiar contraseña</a>
+            </div>
+
+            <section class="hoja formulario">
+                <dl class="dato">
+                    <dt>Nombre completo</dt><dd th:text="${docente.nombreCompleto}">Ana Pérez</dd>
+                    <dt>Email (usuario)</dt><dd th:text="${docente.email}">ana@colegio.com</dd>
+                    <dt>Sexo</dt><dd th:text="${docente.sexo}">Femenino</dd>
+                    <dt>Fecha de nacimiento</dt><dd th:text="${docente.fechaNacimiento}">1990-01-01</dd>
+                    <dt>Rol</dt><dd th:text="${docente.rol}">ROLE_DOCENTE</dd>
+                    <dt>Alta en el sistema</dt><dd th:text="${docente.fechaRegistro}">01/01/2026</dd>
+                </dl>
+            </section>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

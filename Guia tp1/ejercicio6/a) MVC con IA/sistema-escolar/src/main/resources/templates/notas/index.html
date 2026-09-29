@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Notas')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('notas')}"></aside>
+
+    <div class="main-content">
+        <main class="contenido">
+            <div th:replace="~{fragments/layout :: mensajes}"></div>
+
+            <div class="page-head">
+                <div>
+                    <h1>Notas</h1>
+                    <p>Filtra por alumno, materia o período.</p>
+                </div>
+                <a th:href="@{/notas/nueva}" class="btn btn-marcador"><i class="bi bi-plus-lg" aria-hidden="true"></i> Registrar nota</a>
+            </div>
+
+            <section class="hoja">
+                <!-- Filtros por GET. Las opciones conservan la selección con th:selected -->
+                <form th:action="@{/notas}" method="get" class="row g-2 mb-3">
+                    <div class="col-md-4">
+                        <label for="alumnoId" class="form-label">Alumno</label>
+                        <select class="form-select" id="alumnoId" name="alumnoId">
+                            <option value="">Todos</option>
+                            <option th:each="a : ${alumnos}" th:value="${a.id}" th:text="${a.nombreCompleto}"
+                                    th:selected="${filtroAlumnoId != null and filtroAlumnoId == a.id}">Pérez, Ana</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="materiaId" class="form-label">Materia</label>
+                        <select class="form-select" id="materiaId" name="materiaId">
+                            <option value="">Todas</option>
+                            <option th:each="m : ${materias}" th:value="${m.id}" th:text="${m.nombre}"
+                                    th:selected="${filtroMateriaId != null and filtroMateriaId == m.id}">Matemática</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="periodo" class="form-label">Período</label>
+                        <select class="form-select" id="periodo" name="periodo">
+                            <option value="">Todos</option>
+                            <option th:each="p : ${periodos}" th:value="${p}" th:text="${p.etiqueta}"
+                                    th:selected="${filtroPeriodo != null and filtroPeriodo == p}">1.er trimestre</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-tinta">Filtrar</button>
+                        <a th:href="@{/notas}" class="btn btn-outline-secondary">Limpiar</a>
+                    </div>
+                </form>
+
+                <div class="table-responsive" th:if="${!notas.isEmpty()}">
+                    <table class="tabla">
+                        <thead>
+                        <tr><th>Alumno</th><th>Materia</th><th>Período</th><th>Nota</th><th>Comentarios</th><th>Registró</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="n : ${notas}">
+                            <td class="fw-semibold" th:text="${n.alumnoNombre}">Pérez, Ana</td>
+                            <td th:text="${n.materiaNombre}">Matemática</td>
+                            <td th:text="${n.periodo.etiqueta}">1.er trimestre</td>
+                            <td><span class="nota-marca" th:classappend="${n.aprobado} ? 'nota-ok' : 'nota-bajo'"
+                                      th:text="${#numbers.formatDecimal(n.valorNumerico, 1, 2)}">8,00</span></td>
+                            <td class="text-secondary" th:text="${n.comentarios}">Buen desempeño</td>
+                            <td>
+                                <div th:text="${n.docenteNombre}">Docente</div>
+                                <small class="text-secondary" th:text="${n.fechaRegistro}">01/01/2026 10:00</small>
+                            </td>
+                            <td class="acciones">
+                                <a th:href="@{/notas/editar/{id}(id=${n.id})}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                                <form th:action="@{/notas/eliminar/{id}(id=${n.id})}" method="post" class="d-inline"
+                                      onsubmit="return confirm('¿Eliminar esta nota?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="vacio" th:if="${notas.isEmpty()}">
+                    <i class="bi bi-journal-x" aria-hidden="true"></i>
+                    No hay notas para este filtro. Cambia los criterios o registra una nueva nota.
+                </div>
+            </section>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,168 @@
+/* =============================================================================
+   estilos.css - Identidad visual del Sistema Escolar
+   Idea: el cuaderno del docente. Tinta azul, papel rayado, resaltador amarillo y
+   notas marcadas con lapicera roja (desaprobado) o verde (aprobado).
+   Se apoya en Bootstrap 5 y solo sobrescribe lo necesario.
+   ============================================================================= */
+
+:root {
+    --tinta: #1b2b4b;          /* azul tinta: barra lateral y títulos */
+    --tinta-suave: #2b3f68;
+    --papel: #f2f5fa;          /* fondo general */
+    --hoja: #ffffff;           /* superficies de contenido */
+    --linea: #d5deec;          /* rayas del cuaderno y bordes */
+    --resaltador: #ffd84a;     /* marcador amarillo: acento principal */
+    --lapiz-rojo: #c4303b;     /* desaprobado / margen del cuaderno */
+    --lapiz-verde: #1c7a51;    /* aprobado */
+    --texto: #1f2a3d;
+    --texto-suave: #5b6982;
+
+    --fuente-titulo: "Literata", Georgia, "Times New Roman", serif;
+    --fuente-texto: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --ancho-sidebar: 248px;
+}
+
+/* ------------------------------ Base ------------------------------ */
+body {
+    font-family: var(--fuente-texto);
+    background: var(--papel);
+    color: var(--texto);
+    line-height: 1.55;
+}
+h1, h2, h3, .titulo { font-family: var(--fuente-titulo); color: var(--tinta); font-weight: 700; letter-spacing: -.01em; }
+h1 { font-size: 1.85rem; }
+h2 { font-size: 1.3rem; }
+a { color: var(--tinta-suave); }
+:focus-visible { outline: 3px solid var(--resaltador); outline-offset: 2px; }
+
+/* ------------------------------ Estructura ------------------------------ */
+.app-wrapper { display: flex; min-height: 100vh; }
+.main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.contenido { flex: 1; padding: 2rem clamp(1rem, 3vw, 2.5rem); max-width: 1180px; width: 100%; }
+
+/* ------------------------------ Barra lateral ------------------------------ */
+.sidebar {
+    width: var(--ancho-sidebar);
+    flex-shrink: 0;
+    background: var(--tinta);
+    color: #dfe7f7;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 1rem;
+    position: sticky; top: 0; height: 100vh;
+}
+.sidebar-brand { display: flex; align-items: center; gap: .75rem; padding: 0 .5rem 1.75rem; color: #fff; text-decoration: none; }
+.sidebar-brand .bi { font-size: 1.7rem; color: var(--resaltador); }
+.sidebar-brand span { font-family: var(--fuente-titulo); font-weight: 700; font-size: 1.15rem; line-height: 1.15; }
+.sidebar-brand small { display: block; font-family: var(--fuente-texto); font-weight: 400; font-size: .78rem; color: #9fb0d3; }
+
+.sidebar .nav-link {
+    color: #c9d5ee; border-radius: .5rem; padding: .6rem .75rem; margin-bottom: .2rem;
+    display: flex; align-items: center; gap: .7rem; font-weight: 500;
+}
+.sidebar .nav-link:hover { background: var(--tinta-suave); color: #fff; }
+/* Ítem activo: "subrayado con resaltador" */
+.sidebar .nav-link.active { color: var(--tinta); background: var(--resaltador); font-weight: 600; }
+.sidebar-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--tinta-suave); }
+.sidebar-footer .quien { font-size: .82rem; color: #9fb0d3; margin-bottom: .6rem; word-break: break-all; }
+.sidebar-footer .quien strong { display: block; color: #fff; font-weight: 600; font-size: .9rem; }
+
+/* En pantallas chicas la barra pasa a ser una franja superior */
+@media (max-width: 991.98px) {
+    .app-wrapper { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: static; flex-direction: row; flex-wrap: wrap; align-items: center; padding: .75rem 1rem; gap: .5rem; }
+    .sidebar-brand { padding: 0 1rem 0 0; }
+    .sidebar nav { flex-direction: row !important; flex-wrap: wrap; gap: .25rem; }
+    .sidebar .nav-link { margin: 0; }
+    .sidebar-footer { margin: 0 0 0 auto; padding: 0; border: 0; }
+    .sidebar-footer .quien { display: none; }
+}
+
+/* ------------------------------ Encabezado de página ------------------------------ */
+.page-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
+.page-head p { margin: .25rem 0 0; color: var(--texto-suave); }
+
+/* ------------------------------ Hojas (paneles) ------------------------------ */
+.hoja { background: var(--hoja); border: 1px solid var(--linea); border-radius: .75rem; padding: 1.5rem; }
+.hoja + .hoja { margin-top: 1.5rem; }
+.hoja-titulo { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; }
+
+/* Franja de resumen del panel: una sola hoja dividida por líneas verticales */
+.resumen { display: grid; grid-template-columns: repeat(4, 1fr); padding: 0; overflow: hidden; }
+.resumen > div { padding: 1.25rem 1.5rem; border-right: 1px solid var(--linea); }
+.resumen > div:last-child { border-right: 0; }
+.resumen .cifra { font-family: var(--fuente-titulo); font-size: 2.2rem; font-weight: 700; color: var(--tinta); line-height: 1.1; }
+.resumen .rotulo { color: var(--texto-suave); font-size: .9rem; }
+@media (max-width: 767.98px) {
+    .resumen { grid-template-columns: 1fr 1fr; }
+    .resumen > div { border-bottom: 1px solid var(--linea); }
+}
+
+/* ------------------------------ Tablas: renglones de cuaderno ------------------------------ */
+.tabla { width: 100%; margin: 0; }
+.tabla th { font-weight: 600; color: var(--texto-suave); font-size: .88rem; border-bottom: 2px solid var(--tinta); padding: .6rem .75rem; white-space: nowrap; }
+.tabla td { padding: .75rem; border-bottom: 1px solid var(--linea); vertical-align: middle; }
+.tabla tbody tr:hover { background: #f7f9fd; }
+.tabla .acciones { text-align: right; white-space: nowrap; }
+.vacio { text-align: center; color: var(--texto-suave); padding: 2.5rem 1rem; }
+.vacio .bi { font-size: 2rem; display: block; margin-bottom: .5rem; color: var(--linea); }
+
+/* ------------------------------ La nota marcada con lapicera ------------------------------ */
+.nota-marca {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 3rem; height: 2.4rem; padding: 0 .55rem;
+    font-family: var(--fuente-titulo); font-weight: 700; font-size: 1.05rem;
+    border: 2px solid currentColor; border-radius: 50%/60%;   /* óvalo, como encerrado a mano */
+    transform: rotate(-4deg);
+}
+.nota-ok { color: var(--lapiz-verde); }
+.nota-bajo { color: var(--lapiz-rojo); }
+
+/* ------------------------------ Formularios ------------------------------ */
+.form-label { font-weight: 600; font-size: .92rem; }
+.form-control, .form-select { border-color: #bfcce2; padding: .6rem .8rem; border-radius: .5rem; }
+.form-control:focus, .form-select:focus { border-color: var(--tinta-suave); box-shadow: 0 0 0 .2rem rgba(255, 216, 74, .45); }
+.form-text { color: var(--texto-suave); }
+.formulario { max-width: 760px; }
+
+/* Botones */
+.btn-tinta { background: var(--tinta); color: #fff; border: 0; font-weight: 600; padding: .6rem 1.2rem; border-radius: .5rem; }
+.btn-tinta:hover, .btn-tinta:focus { background: var(--tinta-suave); color: #fff; }
+.btn-marcador { background: var(--resaltador); color: var(--tinta); border: 0; font-weight: 700; padding: .6rem 1.2rem; border-radius: .5rem; }
+.btn-marcador:hover, .btn-marcador:focus { background: #f5c81f; color: var(--tinta); }
+
+/* ------------------------------ Login y registro: la hoja de cuaderno ------------------------------ */
+.acceso { min-height: 100vh; display: grid; grid-template-columns: minmax(280px, 5fr) 6fr; }
+.acceso-cuaderno {
+    background:
+        linear-gradient(90deg, transparent 4.2rem, var(--lapiz-rojo) 4.2rem, var(--lapiz-rojo) calc(4.2rem + 2px), transparent calc(4.2rem + 2px)),
+        repeating-linear-gradient(180deg, var(--tinta) 0, var(--tinta) 2.2rem, #2a3d63 2.2rem, #2a3d63 calc(2.2rem + 1px));
+    color: #fff; display: flex; flex-direction: column; justify-content: center;
+    padding: 3rem 3rem 3rem 6rem;
+}
+.acceso-cuaderno h1 { color: #fff; font-size: clamp(2rem, 3.6vw, 2.9rem); line-height: 1.15; }
+.acceso-cuaderno p { color: #c9d5ee; max-width: 30ch; font-size: 1.05rem; }
+.acceso-cuaderno mark { background: var(--resaltador); color: var(--tinta); padding: 0 .3rem; border-radius: .2rem; }
+.acceso-form { display: flex; align-items: center; justify-content: center; padding: 2.5rem 1.5rem; background: var(--papel); }
+.acceso-form .caja { width: 100%; max-width: 460px; }
+.acceso-form.ancho .caja { max-width: 560px; }
+@media (max-width: 899.98px) {
+    .acceso { grid-template-columns: 1fr; }
+    .acceso-cuaderno { padding: 2rem 1.5rem 2rem 4.5rem; min-height: 0;
+        background:
+            linear-gradient(90deg, transparent 2.8rem, var(--lapiz-rojo) 2.8rem, var(--lapiz-rojo) calc(2.8rem + 2px), transparent calc(2.8rem + 2px)),
+            var(--tinta); }
+}
+
+/* ------------------------------ Pie y detalles ------------------------------ */
+.pie { padding: 1rem clamp(1rem, 3vw, 2.5rem); color: var(--texto-suave); font-size: .85rem; border-top: 1px solid var(--linea); }
+.dato { display: grid; grid-template-columns: 11rem 1fr; gap: .5rem 1rem; margin: 0; }
+.dato dt { color: var(--texto-suave); font-weight: 500; }
+.dato dd { margin: 0; font-weight: 600; }
+.toast-msg { border-left: 5px solid var(--lapiz-verde); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* Mensaje de error bajo un campo (th:errors). Se usa junto a th:errorclass="is-invalid". */
+.error-campo { color: var(--lapiz-rojo); font-size: .875rem; margin-top: .3rem; font-weight: 500; }

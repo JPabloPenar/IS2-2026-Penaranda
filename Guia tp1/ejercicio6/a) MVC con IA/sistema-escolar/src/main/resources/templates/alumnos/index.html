@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Alumnos')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('alumnos')}"></aside>
+
+    <div class="main-content">
+        <main class="contenido">
+            <div th:replace="~{fragments/layout :: mensajes}"></div>
+
+            <div class="page-head">
+                <div>
+                    <h1>Alumnos</h1>
+                    <p>Busca por nombre, apellido o DNI.</p>
+                </div>
+                <a th:href="@{/alumnos/nuevo}" class="btn btn-marcador"><i class="bi bi-plus-lg" aria-hidden="true"></i> Agregar alumno</a>
+            </div>
+
+            <section class="hoja">
+                <!-- Búsqueda por GET: la URL queda /alumnos?q=texto y se puede compartir -->
+                <form th:action="@{/alumnos}" method="get" class="row g-2 mb-3" role="search">
+                    <div class="col-sm">
+                        <label for="q" class="visually-hidden">Buscar alumno</label>
+                        <input type="search" class="form-control" id="q" name="q" th:value="${busqueda}" placeholder="Nombre, apellido o DNI">
+                    </div>
+                    <div class="col-sm-auto d-flex gap-2">
+                        <button type="submit" class="btn btn-tinta">Buscar</button>
+                        <a th:if="${!busqueda.isEmpty()}" th:href="@{/alumnos}" class="btn btn-outline-secondary">Quitar filtro</a>
+                    </div>
+                </form>
+
+                <div class="table-responsive" th:if="${!alumnos.isEmpty()}">
+                    <table class="tabla">
+                        <thead>
+                        <tr><th>Alumno</th><th>DNI</th><th>Grado</th><th>Aula</th><th>Género</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="a : ${alumnos}">
+                            <td class="fw-semibold" th:text="${a.nombreCompleto}">Pérez, Ana</td>
+                            <td th:text="${a.dni}">12345678</td>
+                            <td th:text="${a.gradoNombre}">1° de Primaria</td>
+                            <td th:text="${a.aulaCodigo}">Aula 101</td>
+                            <td th:text="${a.genero.etiqueta}">Femenino</td>
+                            <td class="acciones">
+                                <a th:href="@{/alumnos/editar/{id}(id=${a.id})}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                                <!-- La baja es POST con token CSRF y pide confirmación -->
+                                <form th:action="@{/alumnos/eliminar/{id}(id=${a.id})}" method="post" class="d-inline"
+                                      onsubmit="return confirm('¿Eliminar a este alumno? También se borrarán todas sus notas.');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="vacio" th:if="${alumnos.isEmpty()}">
+                    <i class="bi bi-people" aria-hidden="true"></i>
+                    <span th:if="${busqueda.isEmpty()}">Aún no hay alumnos. Agrega el primero para empezar a cargar notas.</span>
+                    <span th:if="${!busqueda.isEmpty()}">No encontramos alumnos que coincidan con la búsqueda.</span>
+                </div>
+            </section>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

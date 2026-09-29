@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Registrar nota')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('notas')}"></aside>
+
+    <div class="main-content">
+        <main class="contenido">
+            <div class="page-head">
+                <div>
+                    <h1 th:text="${nota.id == null} ? 'Registrar nota' : 'Editar nota'">Registrar nota</h1>
+                    <p>Cada alumno tiene una nota por materia y período. Escala de 0 a 10; se aprueba desde 6.</p>
+                </div>
+            </div>
+
+            <div class="hoja formulario">
+                <form th:action="@{/notas/guardar}" th:object="${nota}" method="post" novalidate>
+                    <input type="hidden" th:field="*{id}">
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="alumnoId" class="form-label">Alumno</label>
+                            <select class="form-select" th:field="*{alumnoId}" th:errorclass="is-invalid">
+                                <option value="">Selecciona un alumno</option>
+                                <option th:each="a : ${alumnos}" th:value="${a.id}"
+                                        th:text="${a.nombreCompleto} + ' - ' + ${a.gradoNombre}">Pérez, Ana - 1° de Primaria</option>
+                            </select>
+                            <div class="error-campo" th:errors="*{alumnoId}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="materiaId" class="form-label">Materia</label>
+                            <select class="form-select" th:field="*{materiaId}" th:errorclass="is-invalid">
+                                <option value="">Selecciona una materia</option>
+                                <option th:each="m : ${materias}" th:value="${m.id}" th:text="${m.nombre}">Matemática</option>
+                            </select>
+                            <div class="error-campo" th:errors="*{materiaId}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="periodo" class="form-label">Período</label>
+                            <select class="form-select" th:field="*{periodo}" th:errorclass="is-invalid">
+                                <option value="">Selecciona un período</option>
+                                <option th:each="p : ${periodos}" th:value="${p}" th:text="${p.etiqueta}">1.er trimestre</option>
+                            </select>
+                            <div class="error-campo" th:errors="*{periodo}"></div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="valorNumerico" class="form-label">Calificación</label>
+                            <input type="number" step="0.01" min="0" max="10" class="form-control"
+                                   th:field="*{valorNumerico}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{valorNumerico}"></div>
+                        </div>
+                        <div class="col-12">
+                            <label for="comentarios" class="form-label">Comentarios (opcional)</label>
+                            <textarea class="form-control" rows="3" maxlength="500" th:field="*{comentarios}" th:errorclass="is-invalid"></textarea>
+                            <div class="error-campo" th:errors="*{comentarios}"></div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-tinta">Guardar nota</button>
+                        <a th:href="@{/notas}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

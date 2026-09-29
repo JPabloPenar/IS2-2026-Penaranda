@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Alumno')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('alumnos')}"></aside>
+
+    <div class="main-content">
+        <main class="contenido">
+            <div class="page-head">
+                <div>
+                    <h1 th:text="${alumno.id == null} ? 'Agregar alumno' : 'Editar alumno'">Agregar alumno</h1>
+                    <p>Todos los campos son obligatorios.</p>
+                </div>
+            </div>
+
+            <div class="hoja formulario">
+                <form th:action="@{/alumnos/guardar}" th:object="${alumno}" method="post" novalidate>
+                    <!-- El id viaja oculto: vacío = alta, con valor = edición -->
+                    <input type="hidden" th:field="*{id}">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" th:field="*{nombre}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{nombre}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="apellido" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" th:field="*{apellido}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{apellido}"></div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="dni" class="form-label">DNI o matrícula</label>
+                            <input type="text" class="form-control" th:field="*{dni}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{dni}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="fechaNacimiento" class="form-label">Fecha de nacimiento</label>
+                            <input type="date" class="form-control" th:field="*{fechaNacimiento}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{fechaNacimiento}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="genero" class="form-label">Género</label>
+                            <select class="form-select" th:field="*{genero}" th:errorclass="is-invalid">
+                                <option value="">Selecciona una opción</option>
+                                <option th:each="g : ${generos}" th:value="${g}" th:text="${g.etiqueta}">Femenino</option>
+                            </select>
+                            <div class="error-campo" th:errors="*{genero}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="gradoId" class="form-label">Grado</label>
+                            <select class="form-select" th:field="*{gradoId}" th:errorclass="is-invalid">
+                                <option value="">Selecciona un grado</option>
+                                <option th:each="g : ${grados}" th:value="${g.id}" th:text="${g.nombre}">1° de Primaria</option>
+                            </select>
+                            <div class="error-campo" th:errors="*{gradoId}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="aulaId" class="form-label">Aula</label>
+                            <select class="form-select" th:field="*{aulaId}" th:errorclass="is-invalid">
+                                <option value="">Selecciona un aula</option>
+                                <option th:each="a : ${aulas}" th:value="${a.id}"
+                                        th:text="${a.codigo} + ' (capacidad ' + ${a.capacidad} + ')'">Aula 101</option>
+                            </select>
+                            <div class="error-campo" th:errors="*{aulaId}"></div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-tinta">Guardar alumno</button>
+                        <a th:href="@{/alumnos}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
