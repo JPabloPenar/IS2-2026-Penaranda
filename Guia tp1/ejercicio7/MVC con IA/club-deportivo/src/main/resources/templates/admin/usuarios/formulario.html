@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Nuevo empleado')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('usuarios')}"></aside>
+
+    <div class="main-content">
+        <main class="contenido">
+            <div class="page-head"><div><h1>Nuevo empleado</h1><p>Crea el acceso de un administrador o de recepción.</p></div></div>
+
+            <div class="hoja formulario">
+                <form th:action="@{/admin/usuarios/guardar}" th:object="${usuario}" method="post" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" th:field="*{nombre}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{nombre}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="apellido" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" th:field="*{apellido}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{apellido}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="username" class="form-label">Usuario</label>
+                            <input type="text" class="form-control" th:field="*{username}" th:errorclass="is-invalid" autocomplete="username">
+                            <div class="error-campo" th:errors="*{username}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" th:field="*{email}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{email}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" th:field="*{password}" th:errorclass="is-invalid" autocomplete="new-password">
+                            <div class="form-text">Mínimo 8 caracteres, con letras y números.</div>
+                            <div class="error-campo" th:errors="*{password}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="rol" class="form-label">Rol</label>
+                            <select class="form-select" th:field="*{rol}" th:errorclass="is-invalid">
+                                <option value="">Selecciona un rol</option>
+                                <option th:each="r : ${roles}" th:value="${r}" th:text="${r.etiqueta}">Recepción</option>
+                            </select>
+                            <div class="error-campo" th:errors="*{rol}"></div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-cancha">Guardar empleado</button>
+                        <a th:href="@{/admin/usuarios}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Empleados')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('usuarios')}"></aside>
+
+    <div class="main-content">
+        <main class="contenido">
+            <div th:replace="~{fragments/layout :: mensajes}"></div>
+
+            <div class="page-head">
+                <div><h1>Empleados</h1><p>Usuarios que pueden operar el sistema.</p></div>
+                <a th:href="@{/admin/usuarios/nuevo}" class="btn btn-silbato"><i class="bi bi-plus-lg" aria-hidden="true"></i> Nuevo empleado</a>
+            </div>
+
+            <section class="hoja">
+                <div class="table-responsive" th:if="${!usuarios.isEmpty()}">
+                    <table class="tabla">
+                        <thead><tr><th>Usuario</th><th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th><th></th></tr></thead>
+                        <tbody>
+                        <tr th:each="u : ${usuarios}">
+                            <td class="fw-semibold" th:text="${u.username}">recepcion</td>
+                            <td th:text="${u.nombreCompleto}">Ana Pérez</td>
+                            <td th:text="${u.email}">ana@club.local</td>
+                            <td th:text="${u.rol.etiqueta}">Recepción</td>
+                            <td>
+                                <span class="etiqueta" th:classappend="${u.activo} ? 'estado-pagada' : 'estado-vencida'"
+                                      th:text="${u.activo} ? 'Activo' : 'Inactivo'">Activo</span>
+                            </td>
+                            <td class="acciones">
+                                <form th:action="@{/admin/usuarios/{id}/alternar-activo(id=${u.id})}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary" th:text="${u.activo} ? 'Desactivar' : 'Activar'">Desactivar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="vacio" th:if="${usuarios.isEmpty()}">
+                    <i class="bi bi-person-badge" aria-hidden="true"></i> Todavía no hay empleados cargados.
+                </div>
+            </section>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Emitir cuota')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('cuotas')}"></aside>
+
+    <div class="main-content">
+        <main class="contenido">
+            <div class="page-head"><div><h1>Emitir cuota</h1><p>Se emite al grupo familiar del socio elegido.</p></div></div>
+
+            <div class="hoja formulario">
+                <form th:action="@{/cuotas/guardar}" th:object="${cuota}" method="post" novalidate>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="socioId" class="form-label">Socio titular</label>
+                            <select class="form-select" th:field="*{socioId}" th:errorclass="is-invalid">
+                                <option value="">Selecciona un socio</option>
+                                <option th:each="s : ${socios}" th:value="${s.id}" th:text="${s.nombreCompleto} + ' - DNI ' + ${s.dni}">Pérez, Ana - DNI 12345678</option>
+                            </select>
+                            <div class="error-campo" th:errors="*{socioId}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="mesPeriodo" class="form-label">Mes</label>
+                            <input type="number" min="1" max="12" class="form-control" th:field="*{mesPeriodo}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{mesPeriodo}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="anioPeriodo" class="form-label">Año</label>
+                            <input type="number" min="2020" max="2100" class="form-control" th:field="*{anioPeriodo}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{anioPeriodo}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="montoTotal" class="form-label">Monto</label>
+                            <input type="number" step="0.01" min="0" class="form-control" th:field="*{montoTotal}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{montoTotal}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="fechaVencimiento" class="form-label">Fecha de vencimiento</label>
+                            <input type="date" class="form-control" th:field="*{fechaVencimiento}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{fechaVencimiento}"></div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-cancha">Emitir cuota</button>
+                        <a th:href="@{/cuotas}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

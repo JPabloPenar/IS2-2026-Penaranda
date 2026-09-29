@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<!--
+  layout.html - Fragmentos reutilizables: cabecera, barra lateral, mensajes, pie y scripts.
+  Cada pagina los incorpora con th:replace="~{fragments/layout :: nombreDelFragmento}".
+-->
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:fragment="head(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titulo} + ' | Club Deportivo'">Club Deportivo</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+
+<body>
+
+<!-- ===== Barra lateral: se resalta la seccion activa ===== -->
+<aside th:fragment="sidebar(activo)" class="sidebar">
+    <a class="sidebar-brand" th:href="@{/accesos}">
+        <i class="bi bi-shield-fill-check" aria-hidden="true"></i>
+        <span>Club Deportivo<small>Gestión y portería</small></span>
+    </a>
+
+    <nav class="nav flex-column" aria-label="Principal">
+        <a class="nav-link" th:classappend="${activo == 'accesos'} ? 'active'" th:href="@{/accesos}">
+            <i class="bi bi-door-open" aria-hidden="true"></i> Control de acceso
+        </a>
+        <a class="nav-link" th:classappend="${activo == 'socios'} ? 'active'" th:href="@{/socios}">
+            <i class="bi bi-people" aria-hidden="true"></i> Socios
+        </a>
+        <a class="nav-link" th:classappend="${activo == 'cuotas'} ? 'active'" th:href="@{/cuotas}">
+            <i class="bi bi-receipt" aria-hidden="true"></i> Cuotas
+        </a>
+        <!-- Solo ADMIN ve el reporte de recaudacion -->
+        <a class="nav-link" sec:authorize="hasRole('ADMIN')" th:classappend="${activo == 'reporte'} ? 'active'" th:href="@{/pagos/reporte}">
+            <i class="bi bi-graph-up" aria-hidden="true"></i> Reporte de pagos
+        </a>
+        <a class="nav-link" sec:authorize="hasRole('ADMIN')" th:classappend="${activo == 'usuarios'} ? 'active'" th:href="@{/admin/usuarios}">
+            <i class="bi bi-person-badge" aria-hidden="true"></i> Empleados
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="quien">Sesión iniciada como <strong sec:authentication="name">recepcion</strong></div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-outline-light btn-sm w-100">
+                <i class="bi bi-box-arrow-left" aria-hidden="true"></i> Cerrar sesión
+            </button>
+        </form>
+    </div>
+</aside>
+
+<!-- ===== Mensajes flash de exito ===== -->
+<div th:fragment="mensajes">
+    <div class="alert alert-success toast-msg alert-dismissible fade show" role="status" th:if="${mensajeExito}">
+        <span th:text="${mensajeExito}">Operación realizada.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+</div>
+
+<footer th:fragment="footer" class="pie">
+    Club Deportivo. El acceso se valida automáticamente contra el estado de la cuota del grupo familiar.
+</footer>
+
+<th:block th:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/app.js}"></script>
+</th:block>
+
+</body>
+</html>

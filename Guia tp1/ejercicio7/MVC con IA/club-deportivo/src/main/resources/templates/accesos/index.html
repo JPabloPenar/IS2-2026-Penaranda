@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Control de acceso')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('accesos')}"></aside>
+
+    <div class="main-content">
+        <main class="contenido">
+            <div class="page-head">
+                <div>
+                    <h1>Control de acceso</h1>
+                    <p>Escribe el DNI, verifica la foto y confirma la entrada o salida.</p>
+                </div>
+            </div>
+
+            <!-- Resultado del último pasaje registrado (flash attribute) -->
+            <section class="hoja mb-4" th:if="${resultadoAcceso}">
+                <div class="resultado-acceso" th:classappend="${resultadoAcceso.permitido} ? 'permitido' : 'rechazado'">
+                    <img th:if="${resultadoAcceso.foto}" th:src="@{/fotos/{f}(f=${resultadoAcceso.foto})}" class="foto-carnet" alt="Foto">
+                    <div class="foto-placeholder" th:unless="${resultadoAcceso.foto}"><i class="bi bi-person" aria-hidden="true"></i></div>
+                    <div>
+                        <div class="veredicto" th:text="${resultadoAcceso.permitido} ? 'ACCESO PERMITIDO' : 'ACCESO RECHAZADO'">ACCESO PERMITIDO</div>
+                        <div class="fw-semibold" th:text="${resultadoAcceso.nombreCompleto} + ' · DNI ' + ${resultadoAcceso.dni}">Pérez, Ana · DNI 12345678</div>
+                        <div class="text-secondary" th:text="${resultadoAcceso.tipoAcceso} + ' registrada a las ' + ${resultadoAcceso.fechaHora}">Entrada registrada</div>
+                        <div class="mt-1" th:text="${resultadoAcceso.mensaje}">Acceso permitido - Cuota al día</div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="row g-4">
+                <div class="col-lg-7">
+                    <!-- Paso 1: buscar por DNI -->
+                    <section class="hoja">
+                        <h2 class="h5 mb-3">Buscar por DNI</h2>
+                        <div class="alert alert-danger" th:if="${errorBusqueda}" th:text="${errorBusqueda}"></div>
+
+                        <form th:action="@{/accesos/buscar}" method="get" class="row g-2">
+                            <div class="col-sm">
+                                <label for="dni" class="visually-hidden">DNI</label>
+                                <input type="text" inputmode="numeric" class="form-control form-control-lg" id="dni" name="dni"
+                                       placeholder="Ingresa el DNI" autofocus required>
+                            </div>
+                            <div class="col-sm-auto">
+                                <button type="submit" class="btn btn-cancha btn-lg">Buscar</button>
+                            </div>
+                        </form>
+
+                        <!-- Paso 2: ficha de la persona encontrada, con foto para validar visualmente -->
+                        <div class="mt-4" th:if="${persona}">
+                            <div class="d-flex gap-3 align-items-center flex-wrap">
+                                <img th:if="${persona.foto}" th:src="@{/fotos/{f}(f=${persona.foto})}" class="foto-carnet" alt="Foto de la persona">
+                                <div class="foto-placeholder" th:unless="${persona.foto}"><i class="bi bi-person" aria-hidden="true"></i></div>
+                                <div class="flex-grow-1">
+                                    <div class="fs-5 fw-semibold" th:text="${persona.nombreCompleto}">Pérez, Ana</div>
+                                    <div class="text-secondary" th:text="${persona.tipo} + ' · ' + ${persona.relacion} + ' · DNI ' + ${persona.dni}">Socio · Titular · DNI 12345678</div>
+                                    <div class="mt-1">
+                                        <span class="etiqueta" th:classappend="${persona.alDia} ? 'estado-pagada' : 'estado-vencida'"
+                                              th:text="${persona.alDia} ? 'Cuota al día' : 'Cuota adeudada'">Cuota al día</span>
+                                        <span class="text-secondary ms-2" th:text="'Último pasaje: ' + ${persona.ultimoAcceso}">Último pasaje: Sin registros previos</span>
+                                    </div>
+                                    <div class="mt-1" th:unless="${persona.activo}">
+                                        <span class="etiqueta estado-vencida">Persona dada de baja</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Confirmacion: el DNI viaja oculto, ya validado por la busqueda -->
+                            <form th:action="@{/accesos/registrar}" th:object="${acceso}" method="post" class="d-flex gap-2 mt-3 flex-wrap">
+                                <input type="hidden" th:field="*{dni}" th:value="${persona.dni}">
+                                <button type="submit" name="tipoAcceso" value="ENTRADA" class="btn btn-cancha"
+                                        th:classappend="${persona.tipoSugerido.name() == 'ENTRADA'} ? '' : 'btn-outline-secondary'">
+                                    <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Registrar entrada
+                                </button>
+                                <button type="submit" name="tipoAcceso" value="SALIDA" class="btn btn-silbato"
+                                        th:classappend="${persona.tipoSugerido.name() == 'SALIDA'} ? '' : 'btn-outline-secondary'">
+                                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Registrar salida
+                                </button>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="col-lg-5">
+                    <section class="hoja">
+                        <div class="hoja-titulo"><h2 class="h5 mb-0">Últimos pasajes</h2></div>
+                        <div th:if="${!ultimosAccesos.isEmpty()}">
+                            <div th:each="a : ${ultimosAccesos}" class="d-flex align-items-center gap-2 py-2 border-bottom">
+                                <img th:if="${a.foto}" th:src="@{/fotos/{f}(f=${a.foto})}" class="foto-carnet chica" alt="">
+                                <div class="foto-placeholder chica" th:unless="${a.foto}"><i class="bi bi-person" aria-hidden="true"></i></div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold small" th:text="${a.nombreCompleto}">Pérez, Ana</div>
+                                    <div class="text-secondary" style="font-size:.8rem" th:text="${a.tipoAcceso} + ' · ' + ${a.fechaHora}">Entrada · 21/09/2026 10:15</div>
+                                </div>
+                                <span class="etiqueta" th:classappend="${a.permitido} ? 'acceso-permitido' : 'acceso-rechazado'"
+                                      th:text="${a.permitido} ? 'OK' : 'Rechazado'">OK</span>
+                            </div>
+                        </div>
+                        <div class="vacio" th:if="${ultimosAccesos.isEmpty()}">
+                            <i class="bi bi-door-open" aria-hidden="true"></i>
+                            Todavía no hay pasajes registrados hoy.
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

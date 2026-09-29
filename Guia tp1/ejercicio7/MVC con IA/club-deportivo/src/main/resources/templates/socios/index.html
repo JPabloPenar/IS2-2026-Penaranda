@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Socios')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('socios')}"></aside>
+
+    <div class="main-content">
+        <main class="contenido">
+            <div th:replace="~{fragments/layout :: mensajes}"></div>
+
+            <div class="page-head">
+                <div>
+                    <h1>Socios</h1>
+                    <p>Busca por nombre, apellido o DNI.</p>
+                </div>
+                <a th:href="@{/socios/nuevo}" class="btn btn-silbato"><i class="bi bi-plus-lg" aria-hidden="true"></i> Nuevo socio</a>
+            </div>
+
+            <section class="hoja">
+                <form th:action="@{/socios}" method="get" class="row g-2 mb-3" role="search">
+                    <div class="col-sm">
+                        <label for="q" class="visually-hidden">Buscar socio</label>
+                        <input type="search" class="form-control" id="q" name="q" th:value="${busqueda}" placeholder="Nombre, apellido o DNI">
+                    </div>
+                    <div class="col-sm-auto d-flex gap-2">
+                        <button type="submit" class="btn btn-cancha">Buscar</button>
+                        <a th:if="${!busqueda.isEmpty()}" th:href="@{/socios}" class="btn btn-outline-secondary">Quitar filtro</a>
+                    </div>
+                </form>
+
+                <div class="table-responsive" th:if="${!socios.isEmpty()}">
+                    <table class="tabla">
+                        <thead><tr><th></th><th>Socio</th><th>DNI</th><th>Estado de cuota</th><th></th></tr></thead>
+                        <tbody>
+                        <tr th:each="s : ${socios}">
+                            <td>
+                                <img th:if="${s.foto}" th:src="@{/fotos/{f}(f=${s.foto})}" class="foto-carnet chica" alt="">
+                                <div class="foto-placeholder chica" th:unless="${s.foto}"><i class="bi bi-person" aria-hidden="true"></i></div>
+                            </td>
+                            <td class="fw-semibold" th:text="${s.nombreCompleto}">Pérez, Ana</td>
+                            <td th:text="${s.dni}">12345678</td>
+                            <td>
+                                <span class="etiqueta" th:classappend="${s.alDia} ? 'estado-pagada' : 'estado-vencida'"
+                                      th:text="${s.alDia} ? 'Al día' : 'Con deuda'">Al día</span>
+                            </td>
+                            <td class="acciones">
+                                <a th:href="@{/socios/{id}(id=${s.id})}" class="btn btn-sm btn-outline-secondary">Ver ficha</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="vacio" th:if="${socios.isEmpty()}">
+                    <i class="bi bi-people" aria-hidden="true"></i>
+                    <span th:if="${busqueda.isEmpty()}">Todavía no hay socios. Registra el primero para empezar.</span>
+                    <span th:if="${!busqueda.isEmpty()}">No encontramos socios que coincidan con la búsqueda.</span>
+                </div>
+            </section>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

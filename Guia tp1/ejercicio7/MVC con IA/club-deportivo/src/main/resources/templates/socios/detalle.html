@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Ficha del socio')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('socios')}"></aside>
+
+    <div class="main-content">
+        <main class="contenido">
+            <div th:replace="~{fragments/layout :: mensajes}"></div>
+
+            <div class="page-head">
+                <div>
+                    <h1 th:text="${detalle.socio.nombreCompleto}">Pérez, Ana</h1>
+                    <p>Ficha del socio, su grupo familiar y sus cuotas.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a th:href="@{/socios/{id}/familiares/nuevo(id=${detalle.socio.id})}" class="btn btn-silbato">
+                        <i class="bi bi-person-plus" aria-hidden="true"></i> Agregar familiar
+                    </a>
+                    <a th:href="@{/cuotas/nueva}" class="btn btn-cancha">Emitir cuota</a>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <section class="hoja text-center">
+                        <img th:if="${detalle.socio.foto}" th:src="@{/fotos/{f}(f=${detalle.socio.foto})}" class="foto-carnet mb-3" style="width:140px;height:140px" alt="Foto del socio">
+                        <div class="foto-placeholder mb-3 mx-auto" style="width:140px;height:140px;font-size:3rem" th:unless="${detalle.socio.foto}"><i class="bi bi-person" aria-hidden="true"></i></div>
+                        <span class="etiqueta" th:classappend="${detalle.alDia} ? 'estado-pagada' : 'estado-vencida'"
+                              th:text="${detalle.alDia} ? 'Cuota al día' : 'Cuota con deuda'">Cuota al día</span>
+                        <dl class="dato mt-4 text-start">
+                            <dt>DNI</dt><dd th:text="${detalle.socio.dni}">12345678</dd>
+                            <dt>Fecha de nacimiento</dt><dd th:text="${detalle.socio.fechaNacimiento}">1990-01-01</dd>
+                            <dt>Email</dt><dd th:text="${detalle.socio.email} ?: '—'">ana@mail.com</dd>
+                            <dt>Teléfono</dt><dd th:text="${detalle.socio.telefono} ?: '—'">—</dd>
+                        </dl>
+                        <form th:action="@{/socios/{id}/baja(id=${detalle.socio.id})}" method="post" class="mt-3"
+                              onsubmit="return confirm('¿Dar de baja a este socio?');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger w-100" th:if="${detalle.socio.activo}">Dar de baja</button>
+                        </form>
+                    </section>
+                </div>
+
+                <div class="col-lg-8">
+                    <section class="hoja">
+                        <div class="hoja-titulo"><h2 class="h5 mb-0">Grupo familiar</h2></div>
+                        <div th:if="${!detalle.familiares.isEmpty()}">
+                            <div th:each="f : ${detalle.familiares}" class="d-flex align-items-center gap-3 py-2 border-bottom">
+                                <img th:if="${f.foto}" th:src="@{/fotos/{f}(f=${f.foto})}" class="foto-carnet chica" alt="">
+                                <div class="foto-placeholder chica" th:unless="${f.foto}"><i class="bi bi-person" aria-hidden="true"></i></div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold" th:text="${f.nombreCompleto}">García, Luis</div>
+                                    <div class="text-secondary small" th:text="${f.relacion} + ' · DNI ' + ${f.dni}">Hijo/a · DNI 87654321</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="vacio" th:if="${detalle.familiares.isEmpty()}">
+                            <i class="bi bi-people" aria-hidden="true"></i> Este socio todavía no tiene familiares cargados.
+                        </div>
+                    </section>
+
+                    <section class="hoja">
+                        <div class="hoja-titulo"><h2 class="h5 mb-0">Cuotas</h2></div>
+                        <div class="table-responsive" th:if="${!detalle.cuotas.isEmpty()}">
+                            <table class="tabla">
+                                <thead><tr><th>Período</th><th>Monto</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th></th></tr></thead>
+                                <tbody>
+                                <tr th:each="c : ${detalle.cuotas}">
+                                    <td th:text="${c.periodo}">09/2026</td>
+                                    <td th:text="'$' + ${#numbers.formatDecimal(c.montoTotal, 1, 2)}">$15000,00</td>
+                                    <td th:text="'$' + ${#numbers.formatDecimal(c.montoPagado, 1, 2)}">$0,00</td>
+                                    <td th:text="'$' + ${#numbers.formatDecimal(c.saldo, 1, 2)}">$15000,00</td>
+                                    <td><span class="etiqueta" th:classappend="${c.estado.claseCss}" th:text="${c.estado.etiqueta}">Pendiente</span></td>
+                                    <td class="acciones">
+                                        <a th:if="${c.estado.name() != 'PAGADA'}" th:href="@{/pagos/cobrar/{id}(id=${c.id})}" class="btn btn-sm btn-cancha">Cobrar</a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="vacio" th:if="${detalle.cuotas.isEmpty()}">
+                            <i class="bi bi-receipt" aria-hidden="true"></i> Este socio todavía no tiene cuotas emitidas.
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,151 @@
+/* =============================================================================
+   estilos.css - Identidad visual del Club Deportivo
+   Idea: cancha y planilla de porteria. Verde cancha, lineas blancas de cal,
+   naranja de silbato para alertas y acentos de "credencial" en las fichas.
+   Se apoya en Bootstrap 5 y solo sobrescribe lo necesario.
+   ============================================================================= */
+
+:root {
+    --cancha: #0f5c3f;         /* verde cancha oscuro: barra lateral */
+    --cancha-suave: #14724e;
+    --cal: #ffffff;            /* lineas de cal: acentos sobre la cancha */
+    --fondo: #f1f6f3;          /* fondo general (cesped visto de lejos) */
+    --hoja: #ffffff;
+    --borde: #d7e4dd;
+    --silbato: #ff7a1a;        /* naranja: acento y alertas de "atencion" */
+    --rojo-tarjeta: #d3273e;   /* tarjeta roja: rechazado / vencido */
+    --verde-ok: #1c8a52;       /* permitido / pagado */
+    --texto: #1c2b25;
+    --texto-suave: #5c6b64;
+
+    --fuente-titulo: "Space Grotesk", "Segoe UI", sans-serif;
+    --fuente-texto: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --ancho-sidebar: 252px;
+}
+
+body { font-family: var(--fuente-texto); background: var(--fondo); color: var(--texto); line-height: 1.55; }
+h1, h2, h3, .titulo { font-family: var(--fuente-titulo); color: var(--cancha); font-weight: 700; }
+h1 { font-size: 1.85rem; }
+h2 { font-size: 1.3rem; }
+a { color: var(--cancha-suave); }
+:focus-visible { outline: 3px solid var(--silbato); outline-offset: 2px; }
+
+.app-wrapper { display: flex; min-height: 100vh; }
+.main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.contenido { flex: 1; padding: 2rem clamp(1rem, 3vw, 2.5rem); max-width: 1180px; width: 100%; }
+
+/* ------------------------------ Barra lateral: "cancha" con linea de mitad de campo ------------------------------ */
+.sidebar {
+    width: var(--ancho-sidebar); flex-shrink: 0; background: var(--cancha); color: #d9efe3;
+    display: flex; flex-direction: column; padding: 1.5rem 1rem; position: sticky; top: 0; height: 100vh;
+    background-image: linear-gradient(var(--cancha), var(--cancha)),
+        repeating-linear-gradient(180deg, rgba(255,255,255,.05) 0 2.4rem, rgba(255,255,255,0) 2.4rem 4.8rem);
+    background-blend-mode: normal;
+}
+.sidebar-brand { display: flex; align-items: center; gap: .75rem; padding: 0 .5rem 1.75rem; color: #fff; text-decoration: none; }
+.sidebar-brand .bi { font-size: 1.7rem; color: var(--silbato); }
+.sidebar-brand span { font-family: var(--fuente-titulo); font-weight: 700; font-size: 1.1rem; line-height: 1.15; }
+.sidebar-brand small { display: block; font-family: var(--fuente-texto); font-weight: 400; font-size: .78rem; color: #a9d3bd; }
+
+.sidebar .nav-link { color: #c3e4d2; border-radius: .5rem; padding: .6rem .75rem; margin-bottom: .2rem; display: flex; align-items: center; gap: .7rem; font-weight: 500; }
+.sidebar .nav-link:hover { background: var(--cancha-suave); color: #fff; }
+.sidebar .nav-link.active { color: var(--cancha); background: #fff; font-weight: 700; }
+.sidebar-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--cancha-suave); }
+.sidebar-footer .quien { font-size: .82rem; color: #a9d3bd; margin-bottom: .6rem; word-break: break-all; }
+.sidebar-footer .quien strong { display: block; color: #fff; font-weight: 600; font-size: .9rem; }
+
+@media (max-width: 991.98px) {
+    .app-wrapper { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: static; flex-direction: row; flex-wrap: wrap; align-items: center; padding: .75rem 1rem; gap: .5rem; background-image:none; }
+    .sidebar-brand { padding: 0 1rem 0 0; }
+    .sidebar nav { flex-direction: row !important; flex-wrap: wrap; gap: .25rem; }
+    .sidebar .nav-link { margin: 0; }
+    .sidebar-footer { margin: 0 0 0 auto; padding: 0; border: 0; }
+    .sidebar-footer .quien { display: none; }
+}
+
+.page-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
+.page-head p { margin: .25rem 0 0; color: var(--texto-suave); }
+
+.hoja { background: var(--hoja); border: 1px solid var(--borde); border-radius: .75rem; padding: 1.5rem; }
+.hoja + .hoja { margin-top: 1.5rem; }
+.hoja-titulo { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; flex-wrap: wrap; gap: .5rem; }
+
+.resumen { display: grid; grid-template-columns: repeat(4, 1fr); padding: 0; overflow: hidden; }
+.resumen > div { padding: 1.25rem 1.5rem; border-right: 1px solid var(--borde); }
+.resumen > div:last-child { border-right: 0; }
+.resumen .cifra { font-family: var(--fuente-titulo); font-size: 2rem; font-weight: 700; color: var(--cancha); line-height: 1.1; }
+.resumen .rotulo { color: var(--texto-suave); font-size: .9rem; }
+@media (max-width: 767.98px) { .resumen { grid-template-columns: 1fr 1fr; } .resumen > div { border-bottom: 1px solid var(--borde); } }
+
+.tabla { width: 100%; margin: 0; }
+.tabla th { font-weight: 600; color: var(--texto-suave); font-size: .88rem; border-bottom: 2px solid var(--cancha); padding: .6rem .75rem; white-space: nowrap; }
+.tabla td { padding: .75rem; border-bottom: 1px solid var(--borde); vertical-align: middle; }
+.tabla tbody tr:hover { background: #f6faf8; }
+.tabla .acciones { text-align: right; white-space: nowrap; }
+.vacio { text-align: center; color: var(--texto-suave); padding: 2.5rem 1rem; }
+.vacio .bi { font-size: 2rem; display: block; margin-bottom: .5rem; color: var(--borde); }
+
+/* ------------------------------ Foto de rostro: "carnet" del club ------------------------------ */
+.foto-carnet { width: 96px; height: 96px; border-radius: .6rem; object-fit: cover; border: 3px solid var(--cal); box-shadow: 0 0 0 2px var(--borde); background: var(--fondo); }
+.foto-carnet.chica { width: 44px; height: 44px; border-width: 2px; border-radius: .4rem; }
+.foto-placeholder { width: 96px; height: 96px; border-radius: .6rem; background: var(--fondo); border: 2px dashed var(--borde); display: flex; align-items: center; justify-content: center; color: var(--texto-suave); font-size: 1.8rem; }
+.foto-placeholder.chica { width: 44px; height: 44px; font-size: 1.1rem; border-radius: .4rem; }
+
+/* ------------------------------ Etiquetas de estado (tarjeta amarilla/roja) ------------------------------ */
+.etiqueta { display: inline-flex; align-items: center; gap: .35rem; padding: .3rem .7rem; border-radius: 999px; font-weight: 600; font-size: .82rem; }
+.estado-pagada, .acceso-permitido { background: #e3f6ec; color: var(--verde-ok); }
+.estado-pendiente { background: #fff3e3; color: #a35a00; }
+.estado-vencida, .acceso-rechazado { background: #fbe4e7; color: var(--rojo-tarjeta); }
+
+/* Resultado grande del control de acceso: como la pantalla de un molinete */
+.resultado-acceso { display: flex; gap: 1.25rem; align-items: center; padding: 1.5rem; border-radius: .85rem; border: 2px solid; }
+.resultado-acceso.permitido { border-color: var(--verde-ok); background: #eefbf3; }
+.resultado-acceso.rechazado { border-color: var(--rojo-tarjeta); background: #fdeeef; }
+.resultado-acceso .veredicto { font-family: var(--fuente-titulo); font-size: 1.4rem; font-weight: 700; }
+.resultado-acceso.permitido .veredicto { color: var(--verde-ok); }
+.resultado-acceso.rechazado .veredicto { color: var(--rojo-tarjeta); }
+
+.form-label { font-weight: 600; font-size: .92rem; }
+.form-control, .form-select { border-color: #bcd2c6; padding: .6rem .8rem; border-radius: .5rem; }
+.form-control:focus, .form-select:focus { border-color: var(--cancha-suave); box-shadow: 0 0 0 .2rem rgba(255, 122, 26, .25); }
+.form-text { color: var(--texto-suave); }
+.formulario { max-width: 760px; }
+.error-campo { color: var(--rojo-tarjeta); font-size: .875rem; margin-top: .3rem; font-weight: 500; }
+
+.btn-cancha { background: var(--cancha); color: #fff; border: 0; font-weight: 600; padding: .6rem 1.2rem; border-radius: .5rem; }
+.btn-cancha:hover, .btn-cancha:focus { background: var(--cancha-suave); color: #fff; }
+.btn-silbato { background: var(--silbato); color: #fff; border: 0; font-weight: 700; padding: .6rem 1.2rem; border-radius: .5rem; }
+.btn-silbato:hover, .btn-silbato:focus { background: #e6690a; color: #fff; }
+
+/* ------------------------------ Login: cancha con linea de mitad de campo y circulo central ------------------------------ */
+.acceso { min-height: 100vh; display: grid; grid-template-columns: minmax(280px, 5fr) 6fr; }
+.acceso-cancha {
+    position: relative; overflow: hidden; background: var(--cancha); color: #fff;
+    display: flex; flex-direction: column; justify-content: center; padding: 3rem 3rem 3rem 4rem;
+}
+.acceso-cancha::before {
+    content: ""; position: absolute; right: -140px; top: 50%; width: 320px; height: 320px;
+    border: 3px solid rgba(255,255,255,.25); border-radius: 50%; transform: translateY(-50%);
+}
+.acceso-cancha::after {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: rgba(255,255,255,.25);
+}
+.acceso-cancha h1 { color: #fff; font-size: clamp(2rem, 3.6vw, 2.8rem); line-height: 1.15; position: relative; }
+.acceso-cancha p { color: #cdeadb; max-width: 30ch; font-size: 1.05rem; position: relative; }
+.acceso-form { display: flex; align-items: center; justify-content: center; padding: 2.5rem 1.5rem; background: var(--fondo); }
+.acceso-form .caja { width: 100%; max-width: 440px; }
+@media (max-width: 899.98px) {
+    .acceso { grid-template-columns: 1fr; }
+    .acceso-cancha { padding: 2rem 1.5rem; min-height: 0; }
+    .acceso-cancha::before, .acceso-cancha::after { display: none; }
+}
+
+.pie { padding: 1rem clamp(1rem, 3vw, 2.5rem); color: var(--texto-suave); font-size: .85rem; border-top: 1px solid var(--borde); }
+.dato { display: grid; grid-template-columns: 11rem 1fr; gap: .5rem 1rem; margin: 0; }
+.dato dt { color: var(--texto-suave); font-weight: 500; }
+.dato dd { margin: 0; font-weight: 600; }
+.toast-msg { border-left: 5px solid var(--verde-ok); }
+.dropzone { border: 2px dashed var(--borde); border-radius: .6rem; padding: 1rem; text-align: center; color: var(--texto-suave); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }

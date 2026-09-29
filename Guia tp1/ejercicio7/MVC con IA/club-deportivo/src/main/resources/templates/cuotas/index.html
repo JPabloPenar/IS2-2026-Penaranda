@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Cuotas')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('cuotas')}"></aside>
+
+    <div class="main-content">
+        <main class="contenido">
+            <div th:replace="~{fragments/layout :: mensajes}"></div>
+
+            <div class="page-head">
+                <div><h1>Cuotas</h1><p>Filtra por estado y cobra las pendientes o vencidas.</p></div>
+                <a th:href="@{/cuotas/nueva}" class="btn btn-silbato"><i class="bi bi-plus-lg" aria-hidden="true"></i> Emitir cuota</a>
+            </div>
+
+            <section class="hoja">
+                <form th:action="@{/cuotas}" method="get" class="row g-2 mb-3">
+                    <div class="col-md-3">
+                        <select class="form-select" name="estado" onchange="this.form.submit()">
+                            <option value="">Todos los estados</option>
+                            <option th:each="e : ${estados}" th:value="${e}" th:text="${e.etiqueta}"
+                                    th:selected="${filtroEstado != null and filtroEstado == e}">Pendiente</option>
+                        </select>
+                    </div>
+                    <div class="col-md-auto"><a th:href="@{/cuotas}" class="btn btn-outline-secondary">Limpiar</a></div>
+                </form>
+
+                <div class="table-responsive" th:if="${!cuotas.isEmpty()}">
+                    <table class="tabla">
+                        <thead><tr><th>Titular</th><th>Período</th><th>Vence</th><th>Monto</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th></th></tr></thead>
+                        <tbody>
+                        <tr th:each="c : ${cuotas}">
+                            <td class="fw-semibold" th:text="${c.titularNombre}">Pérez, Ana</td>
+                            <td th:text="${c.periodo}">09/2026</td>
+                            <td th:text="${c.fechaVencimiento}">2026-09-10</td>
+                            <td th:text="'$' + ${#numbers.formatDecimal(c.montoTotal, 1, 2)}">$15000,00</td>
+                            <td th:text="'$' + ${#numbers.formatDecimal(c.montoPagado, 1, 2)}">$0,00</td>
+                            <td th:text="'$' + ${#numbers.formatDecimal(c.saldo, 1, 2)}">$15000,00</td>
+                            <td><span class="etiqueta" th:classappend="${c.estado.claseCss}" th:text="${c.estado.etiqueta}">Pendiente</span></td>
+                            <td class="acciones">
+                                <a th:if="${c.estado.name() != 'PAGADA'}" th:href="@{/pagos/cobrar/{id}(id=${c.id})}" class="btn btn-sm btn-cancha">Cobrar</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="vacio" th:if="${cuotas.isEmpty()}">
+                    <i class="bi bi-receipt" aria-hidden="true"></i> No hay cuotas para este filtro.
+                </div>
+            </section>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Nuevo socio')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('socios')}"></aside>
+
+    <div class="main-content">
+        <main class="contenido">
+            <div class="page-head">
+                <div><h1>Nuevo socio</h1><p>El socio queda como titular de un nuevo grupo familiar.</p></div>
+            </div>
+
+            <div class="hoja formulario">
+                <!-- enctype="multipart/form-data" es obligatorio para poder subir la foto -->
+                <form th:action="@{/socios/guardar}" th:object="${socio}" method="post" enctype="multipart/form-data" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" th:field="*{nombre}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{nombre}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="apellido" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" th:field="*{apellido}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{apellido}"></div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="dni" class="form-label">DNI</label>
+                            <input type="text" class="form-control" th:field="*{dni}" th:errorclass="is-invalid" placeholder="Sin puntos">
+                            <div class="error-campo" th:errors="*{dni}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="fechaNacimiento" class="form-label">Fecha de nacimiento</label>
+                            <input type="date" class="form-control" th:field="*{fechaNacimiento}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{fechaNacimiento}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="telefono" class="form-label">Teléfono (opcional)</label>
+                            <input type="text" class="form-control" th:field="*{telefono}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{telefono}"></div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="email" class="form-label">Email (opcional)</label>
+                            <input type="email" class="form-control" th:field="*{email}" th:errorclass="is-invalid">
+                            <div class="error-campo" th:errors="*{email}"></div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="foto" class="form-label">Foto del rostro</label>
+                            <div class="d-flex align-items-center gap-3">
+                                <img id="previsualizacion" src="#" class="foto-carnet d-none" alt="Previsualización">
+                                <div id="previsualizacion-placeholder" class="foto-placeholder"><i class="bi bi-camera" aria-hidden="true"></i></div>
+                                <div class="flex-grow-1">
+                                    <input type="file" class="form-control" id="foto" name="foto" accept="image/jpeg,image/png"
+                                           data-preview="previsualizacion">
+                                    <div class="form-text">JPEG o PNG, hasta 2 MB. Se usa para validar visualmente el ingreso en portería.</div>
+                                    <div class="error-campo" th:errors="*{foto}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-cancha">Guardar socio</button>
+                        <a th:href="@{/socios}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

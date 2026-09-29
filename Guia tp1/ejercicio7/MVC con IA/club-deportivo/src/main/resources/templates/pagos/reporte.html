@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reporte de pagos')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('reporte')}"></aside>
+
+    <div class="main-content">
+        <main class="contenido">
+            <div class="page-head"><div><h1>Reporte de pagos</h1><p>Recaudación por rango de fechas y medio de pago.</p></div></div>
+
+            <section class="hoja mb-4">
+                <form method="get" class="row g-2 align-items-end">
+                    <div class="col-sm-4">
+                        <label for="desde" class="form-label">Desde</label>
+                        <input type="date" class="form-control" id="desde" name="desde" th:value="${reporte.desde}">
+                    </div>
+                    <div class="col-sm-4">
+                        <label for="hasta" class="form-label">Hasta</label>
+                        <input type="date" class="form-control" id="hasta" name="hasta" th:value="${reporte.hasta}">
+                    </div>
+                    <div class="col-sm-auto"><button type="submit" class="btn btn-cancha">Filtrar</button></div>
+                </form>
+            </section>
+
+            <section class="hoja resumen mb-4" aria-label="Totales por medio de pago"
+                     th:style="'grid-template-columns: repeat(' + (${reporte.totales.size()} + 1) + ', 1fr)'">
+                <div th:each="t : ${reporte.totales}">
+                    <div class="cifra" th:text="'$' + ${#numbers.formatDecimal(t.total, 1, 2)}">$0,00</div>
+                    <div class="rotulo" th:text="${t.medio.etiqueta} + ' (' + ${t.cantidad} + ')'">Efectivo (0)</div>
+                </div>
+                <div>
+                    <div class="cifra" th:text="'$' + ${#numbers.formatDecimal(reporte.totalGeneral, 1, 2)}">$0,00</div>
+                    <div class="rotulo" th:text="'Total (' + ${reporte.cantidadTotal} + ' pagos)'">Total</div>
+                </div>
+            </section>
+
+            <section class="hoja">
+                <div class="hoja-titulo"><h2 class="h5 mb-0">Detalle</h2></div>
+                <div class="alert alert-info" th:if="${reporte.detalleLimitado}">
+                    El detalle muestra los primeros 500 pagos del rango. Los totales de arriba corresponden a TODO el rango.
+                </div>
+                <div class="table-responsive" th:if="${!reporte.pagos.isEmpty()}">
+                    <table class="tabla">
+                        <thead><tr><th>Fecha</th><th>Titular</th><th>Período</th><th>Medio</th><th>Referencia</th><th>Monto</th></tr></thead>
+                        <tbody>
+                        <tr th:each="p : ${reporte.pagos}">
+                            <td th:text="${p.fechaPago}">21/09/2026 10:15</td>
+                            <td th:text="${p.titularNombre}">Pérez, Ana</td>
+                            <td th:text="${p.periodo}">09/2026</td>
+                            <td th:text="${p.medioPago.etiqueta}">Efectivo</td>
+                            <td th:text="${p.comprobanteReferencia} ?: '—'">—</td>
+                            <td th:text="'$' + ${#numbers.formatDecimal(p.montoPagado, 1, 2)}">$15000,00</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="vacio" th:if="${reporte.pagos.isEmpty()}">
+                    <i class="bi bi-graph-up" aria-hidden="true"></i> No hay pagos registrados en este rango.
+                </div>
+            </section>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

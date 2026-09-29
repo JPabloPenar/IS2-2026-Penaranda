@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Cobrar cuota')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('cuotas')}"></aside>
+
+    <div class="main-content">
+        <main class="contenido">
+            <div class="page-head">
+                <div>
+                    <h1>Cobrar cuota</h1>
+                    <p th:text="${cuota.titularNombre} + ' · Período ' + ${cuota.periodo}">Pérez, Ana · Período 09/2026</p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-5">
+                    <section class="hoja">
+                        <dl class="dato">
+                            <dt>Monto total</dt><dd th:text="'$' + ${#numbers.formatDecimal(cuota.montoTotal, 1, 2)}">$15000,00</dd>
+                            <dt>Pagado</dt><dd th:text="'$' + ${#numbers.formatDecimal(cuota.montoPagado, 1, 2)}">$0,00</dd>
+                            <dt>Saldo</dt><dd th:text="'$' + ${#numbers.formatDecimal(cuota.saldo, 1, 2)}">$15000,00</dd>
+                            <dt>Vence</dt><dd th:text="${cuota.fechaVencimiento}">2026-09-10</dd>
+                            <dt>Estado</dt><dd><span class="etiqueta" th:classappend="${cuota.estado.claseCss}" th:text="${cuota.estado.etiqueta}">Pendiente</span></dd>
+                        </dl>
+                    </section>
+                </div>
+
+                <div class="col-md-7">
+                    <section class="hoja formulario">
+                        <form th:action="@{/pagos/guardar}" th:object="${pago}" method="post" novalidate>
+                            <input type="hidden" th:field="*{cuotaId}">
+
+                            <div class="mb-3">
+                                <label for="montoPagado" class="form-label">Monto a cobrar</label>
+                                <input type="number" step="0.01" min="0" class="form-control" th:field="*{montoPagado}" th:errorclass="is-invalid"
+                                       th:value="${pago.montoPagado} ?: ${cuota.saldo}">
+                                <div class="error-campo" th:errors="*{montoPagado}"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="medioPago" class="form-label">Medio de pago</label>
+                                <select class="form-select" th:field="*{medioPago}" th:errorclass="is-invalid">
+                                    <option value="">Selecciona un medio</option>
+                                    <option th:each="m : ${medios}" th:value="${m}" th:text="${m.etiqueta}">Efectivo</option>
+                                </select>
+                                <div class="error-campo" th:errors="*{medioPago}"></div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="comprobanteReferencia" class="form-label">
+                                    N.º de operación / ID de pago <span class="text-secondary">(no requerido en efectivo)</span>
+                                </label>
+                                <input type="text" class="form-control" th:field="*{comprobanteReferencia}" th:errorclass="is-invalid">
+                                <div class="error-campo" th:errors="*{comprobanteReferencia}"></div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-cancha">Registrar pago</button>
+                                <a th:href="@{/cuotas}" class="btn btn-outline-secondary">Cancelar</a>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
